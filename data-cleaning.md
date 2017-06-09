@@ -1,6 +1,8 @@
 # Preliminary operations for the IHDS-II dataset
 Tommaso Rigon  
 
+
+
 ## The Indian Human Development Survey-II (IHDS-II)
 
 This short tutorial explain in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset. From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
@@ -60,8 +62,6 @@ dataset <- IHDS_II %>% transmute(state = STATEID,
                                  method = FP2B, 
                                  eligible= EWELIGIBLE)
 ```
-
-
 
 ## Selecting eligible women
 
@@ -149,57 +149,106 @@ The dataset now comprises a total of 30524 observations out of `35281`, which is
 
 ## Relabeling variables and categories
 
+For aesthetical reasons, we changed the name of some categories. The category `Delhi` is relabelled `NCT of Delhi` and `Uttar Pradesh` is fixed as baseline level.
+
 
 ```r
 library(stringr)
-# state levels
-levels(dataset$state) <- str_sub(levels(dataset$state), 6, -4)
-
-# Grouping levels of edu
+levels(dataset$state)     <- str_sub(levels(dataset$state), 6, -4)
 levels(dataset$education) <- str_sub(levels(dataset$education), 6, -2)
+levels(dataset$area)      <- str_sub(levels(dataset$area), 5, -3)
+levels(dataset$contraceptive) <- str_sub(levels(dataset$contraceptive), 5, -3)
+levels(dataset$method)    <- str_sub(levels(dataset$method), 6, -3)
+levels(dataset$religion)  <- str_sub(levels(dataset$religion), 5, -3)
+
+# Re-order alphabetically the levels
+dataset$state <- factor(as.character(dataset$state))
+# State levels
+levels(dataset$state)[levels(dataset$state)=="Delhi"] <- "NCT of Delhi"
+
+# Uttar pradesh is now the baseline level.
+new_levels    <- c("Uttar Pradesh",levels(dataset$state)[-which(levels(dataset$state)=="Uttar Pradesh")])
+dataset$state <- factor(dataset$state,levels=new_levels); rm(new_levels)
+levels(dataset$state)
+```
+
+```
+##  [1] "Uttar Pradesh"      "Andhra Pradesh"     "Arunachal Pradesh" 
+##  [4] "Assam"              "Bihar"              "Chandigarh"        
+##  [7] "Chhattisgarh"       "Dadra+Nagar Haveli" "Daman & Diu"       
+## [10] "NCT of Delhi"       "Goa"                "Gujarat"           
+## [13] "Haryana"            "Himachal Pradesh"   "Jammu & Kashmir"   
+## [16] "Jharkhand"          "Karnataka"          "Kerala"            
+## [19] "Madhya Pradesh"     "Maharashtra"        "Manipur"           
+## [22] "Meghalaya"          "Mizoram"            "Nagaland"          
+## [25] "Orissa"             "Pondicherry"        "Punjab"            
+## [28] "Rajasthan"          "Sikkim"             "Tamil Nadu"        
+## [31] "Tripura"            "Uttarakhand"        "West Bengal"
+```
+
+Then, we grouped some of the covariates labels as follow:
+
+- `education`. We create a four level factor for education (No education, Low , Intermediate and High).
+- `religion`. We considered the most frequent religions in India (Hindu, Muslim, Christian), and we gropued the other religions together.
+- `child`. We considered a three level factor for the number of child: none, one or more than one. The \texttt{More than 1} category is fixed as baseline.
+
+
+
+```r
+# Grouping levels of education
 levels(dataset$education) <- c("None", rep("Low", 5), rep("Intermediate", 6), rep("High", 5))
 
 # Grouping levels of religion
-levels(dataset$religion) <- str_sub(levels(dataset$religion), 5, -3)
 levels(dataset$religion) <- c("Hindu", "Muslim", "Christian", rep("Other", 6))
-
-# Relabeling area
-levels(dataset$area) <- str_sub(levels(dataset$area), 5, -3)
-
-# Relabeling contraceptive
-levels(dataset$contraceptive) <- str_sub(levels(dataset$contraceptive), 5, -3)
-
-# Relabeling method
-levels(dataset$method) <- str_sub(levels(dataset$method), 6, -3)
-dataset$method         <- as.factor(dataset$method)
-levels(dataset$method)[c(6,7,10)] <- "2. Sterilization"    # Female sterilization, Hysteroctomy, Male sterilization 
-levels(dataset$method)[c(7,8)] <- "3. Natural methods"    # Periodic abstinence, Withdrawal 
-levels(dataset$method)[c(1,2,3,4,5)] <- "4. Modern methods" # Condom, Copper T/IUD, Diaphgram/Jelly, Injectible contraception, Oral pill
-dataset$method <- factor(as.character(dataset$method))
 
 # Relabeling numbers of child
 dataset$child[dataset$child > 1] <- "More than 1"
 dataset$child <- as.factor(dataset$child)
-
-# state levels
-levels(dataset$state)[7] <- "NCT of Delhi"
-dataset$state <- factor(as.character(dataset$state))
-
-# Uttar pradesh is now the first level.
-dataset$state <- factor(dataset$state,levels=levels(dataset$state)[c(32,1:31,33)])
 dataset$child <- factor(dataset$child,levels=levels(dataset$child)[c(3,1,2)])
 ```
+
+The variable `method` is the response variable, which is composed by the following levels:
+
+- `1. No contraceptive method`
+- `2. Sterilization`. Includes female sterilization, hysteroctomy and male sterilization.
+- `3. Natural methods`. Includes periodic abstinence and withdrawal
+- `4. Modern methods`. Includes condom, copper T/IUD, diaphgram / jelly, injectible contraception and oral pill
+
+
+```r
+# Converting variable into a factor
+dataset$method <- factor(as.character(dataset$method))
+
+# Relabeling method levels
+levels(dataset$method)[c(6,7,10)] <- "2. Sterilization"   
+levels(dataset$method)[c(7,8)] <- "3. Natural methods"
+levels(dataset$method)[c(1,2,3,4,5)] <- "4. Modern methods"
+
+# Reorder the levels
+dataset$method <- factor(as.character(dataset$method))
+
+knitr::kable(t(as.matrix(table(dataset$method))))
+```
+
+
+
+ 1. No contraceptive method   2. Sterilization   3. Natural methods   4. Modern methods
+---------------------------  -----------------  -------------------  ------------------
+                       8059              15323                 2914                4228
 
 ## Final dataset
 
 
 ```r
+# Save the dataset into a workspace.
+save.image("dataset.RData")
+# A short description
 str(dataset)
 ```
 
 ```
 ## Classes 'tbl_df', 'tbl' and 'data.frame':	30524 obs. of  10 variables:
-##  $ state        : Factor w/ 33 levels "Uttarakhand",..: 14 14 14 14 14 14 14 14 14 14 ...
+##  $ state        : Factor w/ 33 levels "Uttar Pradesh",..: 15 15 15 15 15 15 15 15 15 15 ...
 ##  $ age          : num  49 26 33 43 47 38 25 42 37 25 ...
 ##  $ education    : Factor w/ 4 levels "None","Low","Intermediate",..: 1 3 4 1 1 1 1 1 1 1 ...
 ##  $ child        : Factor w/ 3 levels "More than 1",..: 1 1 1 1 1 1 3 1 1 1 ...
