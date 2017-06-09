@@ -9,11 +9,11 @@ output:
 
 ## Description
 
-In this tutorial we describe how to estimate the model we described in Section 3 of our paper. We implemented our algorithm in R, making use of the `Rcpp` and `RcppArmadillo` for the most computationally intensive steps. The [R code]() is made available as well as the [C++]() code.
+In this tutorial we describe how to estimate the model we described in Section 3 of our paper. We implemented our algorithm in R, making use of the `Rcpp` and `RcppArmadillo` for the most computationally intensive steps. The [R code](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) is made available as well as the [C++](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp) code.
 
 The Gibbs sampler for our model is contained in the function called `fit_logit`, which we will use extensively later on. As a first step, we load in memory all the required libraries and we compile the C++ code. Moreover, we load in memory also the [previously cleaned](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) dataset.
 
-The functions `logit_ranef`, `logit_ranef_spline` and `logit_ranefDP` allow to estimate the submodels described in Section 4.1 of the paper. The function `logit_ranefDP_spline` estimates the full model. All these functions are 
+The functions `logit_ranef`, `logit_ranef_spline` and `logit_ranefDP` allow to estimate the submodels described in Section 4.1 of the paper. The function `logit_ranefDP_spline` estimates the full model. All these functions are then wrapped by the global `fit_logit` function. 
 
 ```{r loading functions,eval=FALSE}
 library(BayesLogit)
@@ -22,8 +22,14 @@ library(Rcpp)
 library(RcppArmadillo)
 
 rm(list=ls())
+
+# Load the clean dataset
 load("dataset.RData")
+
+# Compile the C++ functions
 sourceCpp("core_functions.cpp")
+
+# Load the R functions
 source("core_functions.R")
 ```
 
