@@ -11,6 +11,7 @@ The functions `logit_ranef`, `logit_ranef_spline` and `logit_ranefDP` allow to e
 
 
 ```r
+library(dplyr)
 library(BayesLogit)
 library(splines)
 library(Rcpp)
@@ -34,13 +35,14 @@ The prior hyperparameters for all our models, discussed in Section 3 and Section
 
 
 ```r
-prior = list(P_Fix_const=1e-2, H=32,
+prior = list(P_Fix_const=1e-2, 
+             H=32,
              a_lambda=1e-3, b_lambda=1e-3,
              a_tau=1e-4, b_tau=1e-4, 
              a_alpha=.1, b_alpha=.1)
 ```
 
-Then, we set the number of MCMC iterations equal to $R= 20'000$ with a burn-in equal to $2'000$. we also define two "formulas": one for the specification in which `age` enters in the predictor linearly and one in which `age` is modeled through Bayesian penalized splines.
+Then, we set the number of MCMC iterations equal to $R= 20'000$ with a burn-in equal to $2'000$. we also define two "formulas": one for the specification in which `age` enters in the predictor linearly and one in which `age` is modeled using Bayesian penalized splines.
 
 
 ```r
@@ -53,7 +55,7 @@ f   <- as.formula(target ~ age + child + area + religion + education)
 f_s <- as.formula(target ~ child + area + religion + education)
 ```
 
-The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the [results of the MCMC chain](), which can be loaded without running the algorithm. 
+The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the [results of the MCMC chain](), which can be loaded in memory without running the following steps.
 
 #### 1. Usage choice
 
@@ -67,12 +69,12 @@ set.seed(123) # We set a seed so that our results are fully reproducible.
 dataset$target     <- factor(dataset$method!="1. No contraceptive method")
 
 # Estimate the submodels
-fit1_ranef         <- fit_logit(f,dataset$state,dataset$Age,dataset,method="ranef",prior,R,burn_in)
-fit1_ranef_s       <- fit_logit(f_s,dataset$state,dataset$Age,dataset,method="ranef_s",prior,R,burn_in)
-fit1_dp_ranef      <- fit_logit(f,dataset$state,dataset$Age,dataset,method="dp_ranef",prior,R,burn_in)
+fit1_ranef         <- fit_logit(f,dataset$state,dataset$age,dataset,method="ranef",prior,R,burn_in)
+fit1_ranef_s       <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="ranef_s",prior,R,burn_in)
+fit1_dp_ranef      <- fit_logit(f,dataset$state,dataset$age,dataset,method="dp_ranef",prior,R,burn_in)
 
 # Estimate the full model
-fit1_dp_ranef_s    <- fit_logit(f_s,dataset$State,dataset$Age,dataset,method="dp_ranef_s",prior,R,burn_in)
+fit1_dp_ranef_s    <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="dp_ranef_s",prior,R,burn_in)
 ```
 
 #### 2. Reversible choice
@@ -122,9 +124,54 @@ fit3_dp_ranef      <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="d
 fit3_dp_ranef_s    <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="dp_ranef_s",prior,R,burn_in)
 ```
 
+We end the estimation step by cleaning the workspace and saving the results.
+
+
+```r
+# Remove the data from the workspace
+rm(dataset,dataset2,dataset3,IHDS_II)
+```
+
+```
+## Warning in rm(dataset, dataset2, dataset3, IHDS_II): oggetto "dataset" non
+## trovato
+```
+
+```
+## Warning in rm(dataset, dataset2, dataset3, IHDS_II): oggetto "dataset2" non
+## trovato
+```
+
+```
+## Warning in rm(dataset, dataset2, dataset3, IHDS_II): oggetto "dataset3" non
+## trovato
+```
+
+```
+## Warning in rm(dataset, dataset2, dataset3, IHDS_II): oggetto "IHDS_II" non
+## trovato
+```
+
+```r
+save.image("estimation.RData")
+```
 
 
 ## Convergence diagnostic
+
+We load again everything in memory, on a clean workspace. Notice that the `estimation.RData` is available online, if the computations are excessive.
+
+
+```r
+rm(list=ls())
+
+# Load the clean dataset
+load("dataset.RData")
+
+# Load the results of the MCMC chain
+load("estimation.RData")
+```
+
 
 ## Results
 
