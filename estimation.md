@@ -1,4 +1,4 @@
-# Estimation and Results
+# Estimation and Diagnostic
 Tommaso Rigon  
 
 ## Description
@@ -163,4 +163,68 @@ load("dataset.RData")
 load("estimation.RData")
 ```
 
+
+```r
+library(coda)
+
+beta_RF1  <- as.mcmc(as.matrix(fit1_dp_ranef_s$beta_RF))
+beta_RF2  <- as.mcmc(as.matrix(fit2_dp_ranef_s$beta_RF))
+beta_RF3  <- as.mcmc(as.matrix(fit3_dp_ranef_s$beta_RF))
+
+beta_spline1 <- as.mcmc(as.matrix(fit1_dp_ranef_s$beta_spline))
+beta_spline2 <- as.mcmc(as.matrix(fit2_dp_ranef_s$beta_spline))
+beta_spline3 <- as.mcmc(as.matrix(fit3_dp_ranef_s$beta_spline))
+
+beta_Fix1  <- as.mcmc(as.matrix(fit1_dp_ranef_s$beta_Fix))
+beta_Fix2  <- as.mcmc(as.matrix(fit2_dp_ranef_s$beta_Fix))
+beta_Fix3  <- as.mcmc(as.matrix(fit3_dp_ranef_s$beta_Fix))
+```
+
+#### Effective sample sizes
+
+
+```r
+# Effective sample size of random effects
+tab1 <- round(rbind(summary(effectiveSize(beta_RF1)),
+summary(effectiveSize(beta_RF2)),
+summary(effectiveSize(beta_RF3))))
+rownames(tab1) <- c("Usage choice","Reversibility choice","Method choice")
+knitr::kable(tab1)
+```
+
+                        Min.   1st Qu.   Median   Mean   3rd Qu.   Max.
+---------------------  -----  --------  -------  -----  --------  -----
+Usage choice               1         2        4      6         6     62
+Reversibility choice       1         2        2      5         4     41
+Method choice              1         1        1      3         5     10
+
+```r
+# Effective sample size of splines coefficients
+tab2 <- round(rbind(summary(effectiveSize(beta_spline1)),
+summary(effectiveSize(beta_spline2)),
+summary(effectiveSize(beta_spline3))))
+rownames(tab2) <- c("Usage choice","Reversibility choice","Method choice")
+knitr::kable(tab2)
+```
+
+                        Min.   1st Qu.   Median   Mean   3rd Qu.   Max.
+---------------------  -----  --------  -------  -----  --------  -----
+Usage choice               3         4        4      4         5      8
+Reversibility choice       1         1        1      2         2      4
+Method choice              1         2        2      4         3     20
+
+```r
+# Effective sample size of fixed effects
+tab3 <- round(rbind(summary(effectiveSize(beta_Fix1)),
+summary(effectiveSize(beta_Fix2)),
+summary(effectiveSize(beta_Fix3))))
+rownames(tab3) <- c("Usage choice","Reversibility choice","Method choice")
+knitr::kable(tab3)
+```
+
+                        Min.   1st Qu.   Median   Mean   3rd Qu.   Max.
+---------------------  -----  --------  -------  -----  --------  -----
+Usage choice               2         2        3      5         5     20
+Reversibility choice       2         2        2      3         5      7
+Method choice              1         2        6      9        20     20
 
