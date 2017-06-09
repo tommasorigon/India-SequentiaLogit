@@ -57,7 +57,7 @@ levels(dataset$contraceptive) <- str_sub(levels(dataset$contraceptive), 5, -3)
 levels(dataset$method)    <- str_sub(levels(dataset$method), 6, -3)
 levels(dataset$religion)  <- str_sub(levels(dataset$religion), 5, -3)
 
-# Re-order alphabetically the levels
+# Reorder alphabetically the levels
 dataset$state <- factor(as.character(dataset$state))
 # State levels
 levels(dataset$state)[levels(dataset$state)=="Delhi"] <- "NCT of Delhi"
