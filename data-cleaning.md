@@ -230,8 +230,6 @@ dataset$method <- factor(as.character(dataset$method))
 knitr::kable(t(as.matrix(table(dataset$method))))
 ```
 
-
-
  1. No contraceptive method   2. Sterilization   3. Natural methods   4. Modern methods
 ---------------------------  -----------------  -------------------  ------------------
                        8059              15323                 2914                4228
