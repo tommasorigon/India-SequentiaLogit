@@ -5,7 +5,7 @@ Tommaso Rigon
 
 ## The Indian Human Development Survey-II (IHDS-II)
 
-This short tutorial explain in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset. From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
+This short tutorial explain in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset. The code used is also available [here](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.R). From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
 
 > The India Human Development Survey-II (IHDS-II), 2011-12 is a nationally representative, multi-topic survey of 42,152 households in 1,420 villages and 1,042 urban neighborhoods across India. These data are mostly re-interviews of households interviewed for IHDS (ICPSR 22626) in 2004-05.
 
@@ -149,7 +149,7 @@ The dataset now comprises a total of 30524 observations out of `35281`, which is
 
 ## Relabeling variables and categories
 
-For aesthetical reasons, we changed the name of some categories. The category `Delhi` is relabelled `NCT of Delhi` and `Uttar Pradesh` is fixed as baseline level.
+For aesthetical reasons, we changed the name of some categories. The category `Delhi` is relabeled `NCT of Delhi` and `Uttar Pradesh` is setted as baseline level.
 
 
 ```r
@@ -186,11 +186,11 @@ levels(dataset$state)
 ## [31] "Tripura"            "Uttarakhand"        "West Bengal"
 ```
 
-Then, we grouped some of the covariates labels as follow:
+Then, we grouped some of the covariates' labels as follow:
 
-- `education`. We create a four level factor for education (No education, Low , Intermediate and High).
-- `religion`. We considered the most frequent religions in India (Hindu, Muslim, Christian), and we gropued the other religions together.
-- `child`. We considered a three level factor for the number of child: none, one or more than one. The \texttt{More than 1} category is fixed as baseline.
+- `education`. We create a four level factor: `No education`, `Low` , `Intermediate` and `High`.
+- `religion`. We considered the most frequent religions in India (`Hindu`, `Muslim`, `Christian`), and we gropued the other religions together.
+- `child`. We considered a three level factor for the number of child: `None`, `One` or `More than one`. The \texttt{More than 1} category is setted as baseline.
 
 
 
