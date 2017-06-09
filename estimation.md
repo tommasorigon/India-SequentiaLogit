@@ -219,7 +219,7 @@ tab3 <- round(rbind(summary(effectiveSize(beta_Fix1)),
 summary(effectiveSize(beta_Fix2)),
 summary(effectiveSize(beta_Fix3))))
 rownames(tab3) <- c("Usage choice","Reversibility choice","Method choice")
-knitr::kable(tab3)
+knitr::kable(tab3,format='pandoc')
 ```
 
                         Min.   1st Qu.   Median   Mean   3rd Qu.   Max.
