@@ -196,9 +196,9 @@ knitr::kable(tab1,format='markdown')
 
 |                     | Min.| 1st Qu.| Median| Mean| 3rd Qu.| Max.|
 |:--------------------|----:|-------:|------:|----:|-------:|----:|
-|Usage choice         |    1|       2|      4|    6|       6|   62|
-|Reversibility choice |    1|       2|      2|    5|       4|   41|
-|Method choice        |    1|       1|      1|    3|       5|   10|
+|Usage choice         | 1090|    1584|   2305| 2460|    3405| 4000|
+|Reversibility choice |  517|    1738|   2453| 2659|    3621| 4733|
+|Method choice        | 1580|    2724|   3121| 3158|    3781| 4000|
 
 ```r
 # Effective sample size of splines coefficients
@@ -213,9 +213,9 @@ knitr::kable(tab2,format='markdown')
 
 |                     | Min.| 1st Qu.| Median| Mean| 3rd Qu.| Max.|
 |:--------------------|----:|-------:|------:|----:|-------:|----:|
-|Usage choice         |    3|       4|      4|    4|       5|    8|
-|Reversibility choice |    1|       1|      1|    2|       2|    4|
-|Method choice        |    1|       2|      2|    4|       3|   20|
+|Usage choice         | 1032|    1138|   1261| 1458|    1431| 3095|
+|Reversibility choice | 1045|    1111|   1252| 1663|    1846| 3809|
+|Method choice        | 1579|    1733|   1838| 2050|    2135| 3454|
 
 ```r
 # Effective sample size of fixed effects
@@ -230,7 +230,7 @@ knitr::kable(tab3,format='markdown')
 
 |                     | Min.| 1st Qu.| Median| Mean| 3rd Qu.| Max.|
 |:--------------------|----:|-------:|------:|----:|-------:|----:|
-|Usage choice         |    2|       2|      3|    5|       5|   20|
-|Reversibility choice |    2|       2|      2|    3|       5|    7|
-|Method choice        |    1|       2|      6|    9|      20|   20|
+|Usage choice         | 2594|    3342|   3413| 3383|    3617| 4000|
+|Reversibility choice | 2286|    2898|   3263| 3287|    3687| 4360|
+|Method choice        | 2370|    2983|   3217| 3165|    3414| 3718|
 
