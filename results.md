@@ -195,7 +195,7 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 ## Age effect
 
-The `age` effect is obtained by computing the posterior mean of each function f_k(). The first step consists in constructing the B-spline basis function evaluated among the grid of values 15,...,49.
+The `age` effect is obtained by computing the posterior mean of each function f_k(). The first step consists in constructing the B-spline basis function evaluated among the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package.
 
 
 ```r
