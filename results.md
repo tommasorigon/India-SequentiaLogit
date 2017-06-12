@@ -6,14 +6,16 @@ Tommaso Rigon
 
 This part of the tutorial will reproduce the main results of the paper, including the computation of the DIC and WAIC indexes, the graphs and tables.
 
-The starting point are the file containing the results of the MCMC chain available in the [`wprkspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, as explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R).
+The starting point are the file containing the results of the MCMC chain available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, as explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R).
 
 
 
 ```r
-library(dplyr)   # Required to manipulate the dataset
-library(splines) # Required for computing the B-spline basis
-library(ggplot2) # Graphical library
+library(dplyr)     # Required to manipulate the dataset
+library(splines)   # Required for computing the B-spline basis
+library(reshape2)  # Manipulating data
+library(ggplot2)   # Graphical library
+library(gridExtra) # Graphical library
 
 # Clean everything
 rm(list=ls())
@@ -234,7 +236,44 @@ plot <- ggplot(data = data.plot, aes(x = x, y = y,ymin=ymin,ymax=ymax)) + geom_l
 ![Age effect](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/Age_effect.png)
 
 
-#### Random effects: clustering and graphs
+#### Random effects: graphs
 
 
+
+```r
+# Relabel the names of the random effects appropriately
+colnames(fit1_dp_ranef_s$beta_RF) <- colnames(fit2_dp_ranef_s$beta_RF) <- colnames(fit3_dp_ranef_s$beta_RF) <- levels(dataset$state)[-1]
+
+# Usage choice
+data.plot <- melt(as.matrix(fit1_dp_ranef_s$beta_RF))
+data.plot$k <- "Usage choice"
+# Ordering the levels according to the median
+data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit1_dp_ranef_s$beta_RF,2, median))])
+
+p1 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) 
+
+
+# Reversibility choice
+data.plot <- melt(as.matrix(fit2_dp_ranef_s$beta_RF))
+data.plot$k <- "Reversibility choice"
+# Ordering the levels according to the median
+data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit2_dp_ranef_s$beta_RF,2, median))])
+
+p2 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) 
+
+# Method choice
+data.plot <- melt(as.matrix(fit3_dp_ranef_s$beta_RF))
+data.plot$k <- "Method choice"
+data.plot$cluster           <- as.factor(as.numeric(data.plot$Var2))
+# Ordering the levels according to the median
+data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit3_dp_ranef_s$beta_RF,2, median))])
+
+p3 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k)
+```
+
+![State effect](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/State_1.png)
+![State effect](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/State_2.png)
+![State effect](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/State_3.png)
+
+#### Random effects: clustering States
 
