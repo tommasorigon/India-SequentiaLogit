@@ -5,13 +5,13 @@ Tommaso Rigon
 
 ## The Indian Human Development Survey-II (IHDS-II)
 
-This short tutorial explain in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset. From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
+This short document explain in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset in the paper [Rigon, Durante and Torelli (2016). *Bayesian semiparametric modelling of contraceptive behavior in India via sequential logistic regressions* [https://arxiv.org/abs/1405.7555]](https://arxiv.org/abs/1405.7555). From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
 
 > The India Human Development Survey-II (IHDS-II), 2011-12 is a nationally representative, multi-topic survey of 42,152 households in 1,420 villages and 1,042 urban neighborhoods across India. These data are mostly re-interviews of households interviewed for IHDS (ICPSR 22626) in 2004-05.
 
-We cannot re-distribute the data they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is free. 
+We cannot re-distribute the data, but they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is completely free. 
 
-We will use the dataset called **DS3: Eligible Women**. Eligible women are ever-married women aged 15 - 49. Those ever-married women older than 49 years that were interviewed in the initial IHDS wave, **are included in the dataset even if they are not eligible anymore**.
+We have used the dataset called **DS3: Eligible Women**. Eligible women are ever-married women aged 15 - 49. Those ever-married women older than 49 years that were interviewed in the initial IHDS wave, **are included in the dataset even if they are not eligible anymore**.
 
 
 ```r
@@ -29,7 +29,7 @@ dim(da36151.0003)
 
 ## Selection of the variable of interest
 
-Among all the $580$ variables we select only those which we will include in our analysis. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact question posed to each eligible woman is instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables
+Among all the $580$ variables we select only those which we will include in our analysis. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact questions posed to each eligible woman are instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables
 
 - `STATEID`. Relabeled as `state`, contains the name of the State.
 - `EW6`. Relabeled as `age`, represents the age of each eligible woman in 2011.
@@ -65,7 +65,7 @@ dataset <- IHDS_II %>% transmute(state = STATEID,
 
 ## Selecting eligible women
 
-First of all, we select only eligible women, that is, ever married women and aged 15 - 49. Notice that among eligible women there is **one woman** who declared to be 81; we discarded that women as well, since it seems to be either a transcription error or another kind of gross error.
+We select only eligible women, that is, ever married women and aged 15 - 49. Notice that among eligible women there is **one woman** who declared to be 81; we discarded that women as well, since it seems to be either a transcription error or another kind of gross error.
 
 
 ```r
@@ -73,12 +73,13 @@ dataset <- dataset %>% filter(eligible=="(1) Yes 1")
 dataset <- dataset %>% filter(age <= 49)
 ```
 
-Eligible units comprises a total of 35281 observations.
+Eligible units comprise a total of 35281 observations.
 
 ## Missing values 
 
 #### 1. Pregnancy and contraceptive usage
-Some of the selected variables present missing values. In certain circumstances these are structural: e.g. a pregnant woman is not asked to declare whether she is using or not a contraceptive method. 
+
+Some of the selected variables present missing values. In certain circumstances these are induced by the structure of the questionnaire itself. For instance, a pregnant woman is not asked to declare whether she is using or not a contraceptive method. 
 
 
 ```r
@@ -103,7 +104,7 @@ dataset <- filter(dataset, pregnant == "(0) No 0")
 
 #### 2. Contraceptive usage and method usage
 
-Similarly, the `method` variable present some "structural" missingness. Women not using any kind of contraception were not aked about the contraception method. Therefore, we create an additional level called `1. No contraceptive method`.
+Similarly, the `method` variable present some "structural" missingness. Women not using any kind of contraception were not aked about the contraception method adopted. In practive, we create an additional level called `1. No contraceptive method` to distinguish between real and structural missing values.
 
 
 ```r
@@ -119,10 +120,9 @@ Then, we excluded from the analysis the remaining missing values (879 observatio
 dataset <- filter(dataset, method!="(11) Others 11")
 ```
 
-
 #### 3. Other missingness
 
-Unfortunately, there are still some missing values among the some variables but their number is negligible (3 and 7), and therefore we can safely exclude them from the analysis. 
+Unfortunately, there are still some missing values but their number is negligible (3 and 7), and therefore we can safely exclude them from the analysis. 
 
 
 ```r
@@ -145,14 +145,15 @@ summary(subset(dataset,select=c(education, child)))
 dataset <- filter(dataset, !is.na(contraceptive), !is.na(education),  !is.na(child))
 ```
 
-The dataset now comprises a total of 30524 observations out of `35281`, which is the number of eligible units.
+The dataset now comprises a total of 30524 observations out of the original `35281`, which is the number of eligible women.
 
 ## Relabeling variables and categories
 
-For aesthetical reasons, we changed the name of some categories. The category `Delhi` is relabelled `NCT of Delhi` and `Uttar Pradesh` is fixed as baseline level.
+In this section, we change the name of some categories and we fix the baseline for some factor variables. The category `Delhi` is relabelled `NCT of Delhi` and `Uttar Pradesh` is fixed as baseline level.
 
 
 ```r
+# This part "clean" the name of some variables - just for aesthetical reasons.
 library(stringr)
 levels(dataset$state)     <- str_sub(levels(dataset$state), 6, -4)
 levels(dataset$education) <- str_sub(levels(dataset$education), 6, -2)
@@ -226,7 +227,12 @@ levels(dataset$method)[c(1,2,3,4,5)] <- "4. Modern methods"
 
 # Reorder the levels
 dataset$method <- factor(as.character(dataset$method))
+```
 
+The response variable is therefore composed as follows
+
+
+```r
 knitr::kable(t(as.matrix(table(dataset$method))),format='markdown')
 ```
 
@@ -237,6 +243,8 @@ knitr::kable(t(as.matrix(table(dataset$method))),format='markdown')
 |                       8059|            15323|               2914|              4228|
 
 ## Final dataset
+
+The final dataset is saved as a workspace and summarized below.
 
 
 ```r
@@ -259,4 +267,3 @@ str(dataset)
 ##  $ method       : Factor w/ 4 levels "1. No contraceptive method",..: 3 4 2 2 3 2 4 3 3 1 ...
 ##  $ eligible     : Factor w/ 2 levels "(0) No 0","(1) Yes 1": 2 2 2 2 2 2 2 2 2 2 ...
 ```
-

@@ -3,11 +3,13 @@ Tommaso Rigon
 
 ## Description
 
-In this tutorial we describe how to estimate the model we described in Section 3 of our paper. We implemented our algorithm in R, making use of the `Rcpp` and `RcppArmadillo` for the most computationally intensive steps. The [R code](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) is made available as well as the [C++](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp) code.
+In this document we describe how to estimate the model we described in Section 3 of our paper. We implemented our algorithm in R, making use of the `Rcpp` and `RcppArmadillo` R packages for the most computationally intensive steps. The [R code](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) is made available as well as the [C++](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp) code. 
 
-The Gibbs sampler for our model is contained in the function called `fit_logit`, which we will use extensively later on. As a first step, we load in memory all the required libraries and we compile the C++ code. Moreover, we load in memory also the [previously cleaned](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) dataset.
+**Important**. If you encounter error compiling the C++ code on a Mac Os X, this could be due to recent updates of the software `R` (version 3.4.0). Please refer to the [official R documentation](https://cloud.r-project.org/bin/macosx/tools/) for more details on this issue.
 
-The functions `logit_ranef`, `logit_ranef_spline` and `logit_ranefDP` allow to estimate the submodels described in Section 4.1 of the paper. The function `logit_ranefDP_spline` estimates the full model. All these functions are then wrapped by the global `fit_logit` function. 
+The Gibbs sampler for our model is contained in the function called `fit_logit`, which we will use extensively later on. As a first step, we load in memory all the required libraries and we compile the C++ code. Moreover, we load in memory also the previously obtained [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md).
+
+The functions `logit_ranef`, `logit_ranef_spline` and `logit_ranefDP` allow to estimate the submodels described in Section 4.1 of the paper. The function `logit_ranefDP_spline` estimates the full model. All these functions  wrapped by the global `fit_logit` function.
 
 
 ```r
@@ -55,7 +57,7 @@ f   <- as.formula(target ~ age + child + area + religion + education)
 f_s <- as.formula(target ~ child + area + religion + education)
 ```
 
-The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the [results of the MCMC chain](), which can be loaded in memory without running the following steps.
+The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory without running the following steps.
 
 #### 1. Usage choice
 
@@ -113,7 +115,7 @@ set.seed(123) # We set a seed so that our results are fully reproducible.
 dataset3            <- dataset2[dataset2$method != "2. Sterilization",]
 
 # We define the new target variable. 
-dataset3$target     <- factor(dataset3$method == "4. Modern methods") # table(dataset3$target,dataset3$method)
+dataset3$target     <- factor(dataset3$method == "3. Natural methods") # table(dataset3$target,dataset3$method)
 
 # Estimate the submodels
 fit3_ranef         <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="ranef",prior,R,burn_in)
@@ -142,15 +144,36 @@ fit1_dp_ranef_s$beta_spline <- fit1_dp_ranef_s$beta_spline[thinning,]
 fit2_dp_ranef_s$beta_spline <- fit2_dp_ranef_s$beta_spline[thinning,]
 fit3_dp_ranef_s$beta_spline <- fit3_dp_ranef_s$beta_spline[thinning,]
 
-# Remove the data from the workspace
-rm(dataset,dataset2,dataset3,IHDS_II)
-save.image("estimation.RData")
+# Save relevants files
+
+# Baseline
+save(fit1_ranef,
+     fit2_ranef,
+     fit3_ranef,
+     file="workspaces/ranef.RData")
+
+# Splines
+save(fit1_ranef_s,file="workspaces/ranef_s_part1.RData")
+save(fit2_ranef_s,file="workspaces/ranef_s_part2.RData")
+save(fit3_ranef_s,file="workspaces/ranef_s_part3.RData")
+
+# DP
+save(fit1_dp_ranef,
+     fit2_dp_ranef,
+     fit3_dp_ranef,
+     file="workspaces/dp_ranef.RData")
+
+# Full model
+save(fit1_dp_ranef_s,
+     fit2_dp_ranef_s,
+     fit3_dp_ranef_s,
+     file="workspaces/dp_ranef_s.RData")
 ```
 
 
 ## Convergence diagnostic
 
-We load again everything in memory, on a clean workspace. Notice that the `estimation.RData` is available online, if the computations are excessive.
+We load again everything in memory, on a clean workspace. Notice that the results are available also in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, if the computations are excessive. We uploaded the workspaces separately due to limitation of GitHub in file size (max 25Mb).
 
 
 ```r
@@ -160,7 +183,12 @@ rm(list=ls())
 load("dataset.RData")
 
 # Load the results of the MCMC chain
-load("estimation.RData")
+load("workspaces/ranef.RData")
+load("workspaces/ranef_s_part1.RData")
+load("workspaces/ranef_s_part2.RData")
+load("workspaces/ranef_s_part3.RData")
+load("workspaces/dp_ranef.RData")
+load("workspaces/dp_ranef_s.RData")
 ```
 
 
@@ -182,6 +210,8 @@ beta_Fix3  <- as.mcmc(as.matrix(fit3_dp_ranef_s$beta_Fix))
 
 #### Effective sample sizes
 
+The effective sample size is monitored using the function `effectiveSize` of the [`coda`](https://cran.r-project.org/web/packages/coda/index.html) R package.
+
 
 ```r
 # Effective sample size of random effects
@@ -198,7 +228,7 @@ knitr::kable(tab1,format='markdown')
 |:--------------------|----:|-------:|------:|----:|-------:|----:|
 |Usage choice         | 1090|    1584|   2305| 2460|    3405| 4000|
 |Reversibility choice |  517|    1738|   2453| 2659|    3621| 4733|
-|Method choice        | 1580|    2724|   3121| 3158|    3781| 4000|
+|Method choice        | 1393|    2742|   3339| 3129|    3638| 4227|
 
 ```r
 # Effective sample size of splines coefficients
@@ -215,7 +245,7 @@ knitr::kable(tab2,format='markdown')
 |:--------------------|----:|-------:|------:|----:|-------:|----:|
 |Usage choice         | 1032|    1138|   1261| 1458|    1431| 3095|
 |Reversibility choice | 1045|    1111|   1252| 1663|    1846| 3809|
-|Method choice        | 1579|    1733|   1838| 2050|    2135| 3454|
+|Method choice        | 1393|    1477|   1646| 1815|    2075| 2929|
 
 ```r
 # Effective sample size of fixed effects
@@ -232,5 +262,5 @@ knitr::kable(tab3,format='markdown')
 |:--------------------|----:|-------:|------:|----:|-------:|----:|
 |Usage choice         | 2594|    3342|   3413| 3383|    3617| 4000|
 |Reversibility choice | 2286|    2898|   3263| 3287|    3687| 4360|
-|Method choice        | 2370|    2983|   3217| 3165|    3414| 3718|
+|Method choice        | 2416|    2725|   3431| 3178|    3605| 3820|
 
