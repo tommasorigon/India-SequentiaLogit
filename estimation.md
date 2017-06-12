@@ -44,7 +44,7 @@ prior = list(P_Fix_const=1e-2,
              a_alpha=.1, b_alpha=.1)
 ```
 
-Then, we set the number of MCMC iterations equal to $R= 20'000$ with a burn-in equal to $2'000$. we also define two "formulas": one for the specification in which `age` enters in the predictor linearly and one in which `age` is modeled using Bayesian penalized splines.
+Then, we set the number of MCMC iterations equal to `R= 20000` with a burn-in equal to `burn_in=2000`. We also define two `formula`: one for the specification in which `age` enters in the predictor linearly and one in which `age` is modeled using Bayesian penalized splines.
 
 
 ```r

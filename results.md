@@ -6,7 +6,7 @@ Tommaso Rigon
 
 This part of the tutorial will reproduce the main results of the paper, including the computation of the DIC and WAIC indexes, the graphs and tables.
 
-The starting point is the file containing the [results of the MCMC chain](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.RData), as explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) tutorial. We load everything in memory, as well as the dataset and some core functions.
+The starting point are the file containing the results of the MCMC chain available in the [`wprkspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, as explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R).
 
 
 
@@ -22,7 +22,18 @@ rm(list=ls())
 load("dataset.RData")
 
 # Load the results of the MCMC chain
-load("estimation.RData")
+rm(list=ls())
+
+# Load the clean dataset
+load("dataset.RData")
+
+# Load the results of the MCMC chain
+load("workspaces/ranef.RData")
+load("workspaces/ranef_s_part1.RData")
+load("workspaces/ranef_s_part2.RData")
+load("workspaces/ranef_s_part3.RData")
+load("workspaces/dp_ranef.RData")
+load("workspaces/dp_ranef_s.RData")
 
 # Core functions. We will only need the function "IC"
 source("core_functions.R")
@@ -34,11 +45,13 @@ Following [Gelman et al. (2014)](https://link.springer.com/article/10.1007/s1122
 
 Notice that the factorization of our likelihood allows to decompose the DIC and WAIC indexes, that is
 
-$$\text{DIC} = \text{DIC}_\texttt{Usage} + \text{DIC}_\texttt{Reversibility} +\text{DIC}_\texttt{Method},$$
+> DIC = DIC_Usage + DIC_Reversibility + DIC_Method
+
 and similarly
 
-$$\text{WAIC} = \text{WAIC}_\texttt{Usage} + \text{WAIC}_\texttt{Reversibility} +\text{WAIC}_\texttt{Method}.$$
+> WAIC = WAIC_Usage + WAIC_Reversibility + WAIC_Method
 
+The construction of the table is as follows:
 
 
 ```r
@@ -59,22 +72,34 @@ tab <- cbind(c(IC(fit1_ranef)[c(1,2)],
 tab <- rbind(tab[2*(1:4)-1,],-2*tab[2*(1:4),]) # Rearrange for graphical reason
 tab <- data.frame(rep(c("baseline","splines","DP", "DP + splines"),2),
                   round(tab,digits=2), round(rowSums(tab),digits=2))
-colnames(tab) <- c("DIC and WAIC","Usage choice","Reversibility choice","Method choice","Total")
-knitr::kable(tab,format="markdown")
+colnames(tab) <- c("DIC","Usage choice","Reversibility choice","Method choice","Total")
+knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
 ```
 
 
 
-|DIC and WAIC | Usage choice| Reversibility choice| Method choice|    Total|
+|DIC          | Usage choice| Reversibility choice| Method choice|    Total|
 |:------------|------------:|--------------------:|-------------:|--------:|
 |baseline     |     27565.16|             18238.23|       7710.42| 53513.81|
 |splines      |     27271.13|             18166.32|       7658.76| 53096.22|
 |DP           |     27557.82|             18241.65|       7719.04| 53518.52|
 |DP + splines |     27260.91|             18177.30|       7665.90| 53104.11|
+
+
+```r
+colnames(tab) <- c("WAIC","Usage choice","Reversibility choice","Method choice","Total")
+knitr::kable(tab[5:8,],format="markdown",row.names = FALSE)
+```
+
+
+
+|WAIC         | Usage choice| Reversibility choice| Method choice|    Total|
+|:------------|------------:|--------------------:|-------------:|--------:|
 |baseline     |     27565.31|             18236.33|       7707.03| 53508.67|
 |splines      |     27271.28|             18163.70|       7655.40| 53090.38|
 |DP           |     27558.86|             18239.77|       7716.57| 53515.20|
 |DP + splines |     27261.94|             18174.20|       7663.52| 53099.66|
+
 
 Here, we report also the **effective degrees of freedom** for each model, according to both the DIC and the WAIC.
 
@@ -97,30 +122,44 @@ tab <- cbind(c(IC(fit1_ranef)[c(4,5)],
 tab <- rbind(tab[2*(1:4)-1,],tab[2*(1:4),]) # Rearrange for graphical reason.
 tab <- data.frame(rep(c("baseline","splines","DP", "DP + splines"),2),
                   round(tab,digits=2),round(rowSums(tab),digits=2))
-colnames(tab) <- c("Effective degree of freedom","Usage choice","Reversibility choice","Method choice","Total")
-knitr::kable(tab,format="markdown")
+colnames(tab) <- c("Effective degree of freedom - DIC","Usage choice",
+                   "Reversibility choice","Method choice","Total")
+knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
 ```
 
 
 
-|Effective degree of freedom | Usage choice| Reversibility choice| Method choice|  Total|
-|:---------------------------|------------:|--------------------:|-------------:|------:|
-|baseline                    |        42.23|                41.24|         39.71| 123.19|
-|splines                     |        48.59|                46.05|         43.59| 138.23|
-|DP                          |        36.74|                40.32|         41.13| 118.20|
-|DP + splines                |        42.06|                48.58|         43.78| 134.41|
-|baseline                    |        42.39|                39.34|         36.32| 118.04|
-|splines                     |        48.75|                43.42|         40.23| 132.39|
-|DP                          |        37.78|                38.45|         38.66| 114.88|
-|DP + splines                |        43.09|                45.48|         41.40| 129.96|
+|Effective degree of freedom - DIC | Usage choice| Reversibility choice| Method choice|  Total|
+|:---------------------------------|------------:|--------------------:|-------------:|------:|
+|baseline                          |        42.23|                41.24|         39.71| 123.19|
+|splines                           |        48.59|                46.05|         43.59| 138.23|
+|DP                                |        36.74|                40.32|         41.13| 118.20|
+|DP + splines                      |        42.06|                48.58|         43.78| 134.41|
 
-## Fixed effects
-
-In the following, we compute the posterior mean and a $0.95/%$ credible interval for each coefficient.
 
 
 ```r
-alpha <- 0.05 # Coverage level
+colnames(tab) <- c("Effective degree of freedom - WAIC","Usage choice",
+                   "Reversibility choice","Method choice","Total")
+knitr::kable(tab[5:8,],format="markdown",row.names = FALSE)
+```
+
+
+
+|Effective degree of freedom - WAIC | Usage choice| Reversibility choice| Method choice|  Total|
+|:----------------------------------|------------:|--------------------:|-------------:|------:|
+|baseline                           |        42.39|                39.34|         36.32| 118.04|
+|splines                            |        48.75|                43.42|         40.23| 132.39|
+|DP                                 |        37.78|                38.45|         38.66| 114.88|
+|DP + splines                       |        43.09|                45.48|         41.40| 129.96|
+
+## Fixed effects
+
+In the following, we compute the posterior mean of the fixed effect coefficients, together with 0.95% credible interval for each coefficient. 
+
+
+```r
+alpha <- 0.05 # alpha = 1 - Coverage level
 
 tab <-cbind(
   # Usage choice
@@ -156,8 +195,12 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 ## Age effect
 
+The `age` effect is obtained by computing the posterior mean of each function f_k(). The first step consists in constructing the B-spline basis function evaluated among the grid of values 15,...,49.
+
 
 ```r
+# B-spline basis construction
+
 # Knots placement
 inner_knots <- 40; degree <- 3
 xl    <- min(dataset$age); xr <- max(dataset$age); dx <- (xr - xl) / (inner_knots-1)
@@ -166,19 +209,29 @@ knots <- seq(xl - degree * dx, xr + degree * dx, by = dx)
 # Fixed quantities
 B        <- spline.des(knots, 15:49, degree + 1, 0 * 15:49, outer.ok=TRUE)$design
 
+# Posterior sample for each f_k()
 eta1_spline <- t(B%*%t(fit1_dp_ranef_s$beta_spline))
 eta2_spline <- t(B%*%t(fit2_dp_ranef_s$beta_spline))
 eta3_spline <- t(B%*%t(fit3_dp_ranef_s$beta_spline))
 
-# Age effect
-data.plot <- data.frame(x=15:49,y=colMeans(eta1_spline),ymax=apply(eta1_spline,2,function(x) quantile(x,0.975)),ymin=apply(eta1_spline,2,function(x) quantile(x,1-0.975)),k="Usage choice")
-data.plot <- rbind(data.plot,data.frame(x=15:49,y=apply(eta2_spline,2,mean),ymax=apply(eta2_spline,2,function(x) quantile(x,0.975)),ymin=apply(eta2_spline,2,function(x) quantile(x,1-0.975)),k="Reversibility choice"))
-data.plot <- rbind(data.plot,data.frame(x=15:49,y=apply(eta3_spline,2,mean),ymax=apply(eta3_spline,2,function(x) quantile(x,0.975)),ymin=apply(eta3_spline,2,function(x) quantile(x,1-0.975)),k="Method choice"))
+# Plots
+data.plot <- data.frame(x=15:49, y=colMeans(eta1_spline), 
+                        ymax=apply(eta1_spline,2,function(x) quantile(x,0.975)),
+                        ymin=apply(eta1_spline,2,function(x) quantile(x,1-0.975)),
+                        k="Usage choice")
+data.plot <- rbind(data.plot,data.frame(x=15:49,y=apply(eta2_spline,2,mean),
+                                        ymax=apply(eta2_spline,2,function(x) quantile(x,0.975)),
+                                        ymin=apply(eta2_spline,2,function(x) quantile(x,1-0.975)),
+                                        k="Reversibility choice"))
+data.plot <- rbind(data.plot,data.frame(x=15:49,y=apply(eta3_spline,2,mean),
+                                        ymax=apply(eta3_spline,2,function(x) quantile(x,0.975)),
+                                        ymin=apply(eta3_spline,2,function(x) quantile(x,1-0.975)),
+                                        k="Method choice"))
 
-ggplot(data = data.plot, aes(x = x, y = y,ymin=ymin,ymax=ymax)) + geom_line()  +theme_bw()+ xlab("") + ylab("") + geom_ribbon(alpha=0.25) + facet_grid(.~k)
+plot <- ggplot(data = data.plot, aes(x = x, y = y,ymin=ymin,ymax=ymax)) + geom_line()  +theme_bw()+ xlab("") + ylab("") + geom_ribbon(alpha=0.25) + facet_grid(.~k)
 ```
 
-![](results_files/figure-html/age effect-1.png)<!-- -->
+![Age effect](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/Age_effect.png)
 
 
 #### Random effects: clustering and graphs
