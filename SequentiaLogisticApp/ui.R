@@ -1,33 +1,68 @@
-#
-# This is the user-interface definition of a Shiny web application. You can
-# run the application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-# 
-#    http://shiny.rstudio.com/
-#
+## ui.R ##
+library(shinydashboard)
 
-library(shiny)
+header <- dashboardHeader(
+  title = "Sequential probability"
+)
 
-# Define UI for application that draws a histogram
-shinyUI(fluidPage(
-  
-  # Application title
-  titlePanel("Old Faithful Geyser Data"),
-  
-  # Sidebar with a slider input for number of bins 
-  sidebarLayout(
-    sidebarPanel(
-       sliderInput("bins",
-                   "Number of bins:",
-                   min = 1,
-                   max = 50,
-                   value = 30)
+body <- dashboardBody(
+  fluidRow(
+    column(width = 9,
+           box(width = NULL,
+               h4("Usage Choice"),p("In the graph below is represented the posterior density of the probability of using a contraceptive method."),
+               plotOutput("UsageChoice")
+           ),
+           box(width = NULL,
+               h4("Reversible Choice"),p("In the graph below is represented the posterior density of the probability of using a reversible method, provided that a contraceptive method was used."),
+               plotOutput("ReversibleChoice")
+           ),
+           box(width = NULL,
+               h4("Method Choice"),p("In the graph below is represented the posterior density of the probability of using a traditional method, provided that a reversible contraceptive method was used."),
+               plotOutput("MethodChoice")
+           )
     ),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-       plotOutput("distPlot")
+    column(width = 3,
+           
+           box(width = NULL, status = "warning",
+               selectInput("state", label = h4("State"), 
+                           choices = list("Andhra Pradesh"=2,"Arunachal Pradesh"=3, "Assam"=4,    
+                                          "Bihar" =5, "Chandigarh" =6, "Chhattisgarh" =7,
+                                          "Dadra+Nagar Haveli"=8,  "Daman & Diu" =9,      
+                                          "NCT of Delhi"=10, "Goa" =11, "Gujarat" =12,           
+                                          "Haryana"=13, "Himachal Pradesh"=14, "Jammu & Kashmir"=15,
+                                          "Jharkhand"=16, "Karnataka"=17, "Kerala"=118,           
+                                          "Madhya Pradesh"=19, "Maharashtra"=20, "Manipur"=21,         
+                                          "Meghalaya"=22, "Mizoram"=23, "Nagaland"=24,         
+                                          "Orissa"=25, "Pondicherry"=26, "Punjab"=27,            
+                                          "Rajasthan" =28,"Sikkim"=29, "Tamil Nadu"=30,        
+                                          "Tripura"=31, "Uttarakhand"=32,"Uttar Pradesh" = 1,
+                                          "West Bengal"=33), selected = 1)
+           ),
+           box(width = NULL, status = "warning",
+               sliderInput("age", label = h4("Age"), min = 15, 
+                           max = 49, value = 30)
+               
+           ),
+           box(width = NULL, status = "warning",
+               radioButtons("child", label = h4("Child"),
+                            choices = list("None" = 2, "One" = 3, "More than one" = 1), 
+                            selected = 1),
+               radioButtons("area", label = h4("Area"),
+                            choices = list("rural" = 1, "urban" = 2), 
+                            selected = 1),
+               radioButtons("religion", label = h4("Religion"),
+                            choices = list("Hindu" = 1, "Muslim" = 2, "Christian" = 3,"Other" = 4), 
+                            selected = 1),
+               radioButtons("education", label = h4("Education"),
+                            choices = list("None" = 1, "Low" = 2, "Intermediate" = 3,"High" = 4), 
+                            selected = 1)
+           )
     )
   )
-))
+)
+
+dashboardPage(
+  header,
+  dashboardSidebar(disable = TRUE),
+  body
+)
