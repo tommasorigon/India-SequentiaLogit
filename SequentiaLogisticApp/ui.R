@@ -30,7 +30,7 @@ body <- dashboardBody(
                                           "Dadra+Nagar Haveli"=8,  "Daman & Diu" =9,      
                                           "NCT of Delhi"=10, "Goa" =11, "Gujarat" =12,           
                                           "Haryana"=13, "Himachal Pradesh"=14, "Jammu & Kashmir"=15,
-                                          "Jharkhand"=16, "Karnataka"=17, "Kerala"=118,           
+                                          "Jharkhand"=16, "Karnataka"=17, "Kerala"=18,           
                                           "Madhya Pradesh"=19, "Maharashtra"=20, "Manipur"=21,         
                                           "Meghalaya"=22, "Mizoram"=23, "Nagaland"=24,         
                                           "Orissa"=25, "Pondicherry"=26, "Punjab"=27,            
