@@ -1,4 +1,4 @@
-# Estimation and Diagnostic
+# Estimation and convergence checks
 Tommaso Rigon  
 
 ## Description
