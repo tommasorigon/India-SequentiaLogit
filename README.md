@@ -1,4 +1,4 @@
-# India-SequentiaLogit
+# Bayesian semiparametric modelling of contraceptive behaviour in India via sequential logistic regressions
 
 ```r
 library(shiny)
