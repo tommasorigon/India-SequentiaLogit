@@ -74,29 +74,3 @@ NumericVector S_update(arma::vec y, arma::vec strata, int p_RF, arma::vec nu, ar
   }
   return S;
 }
-
-
-// [[Rcpp::export]]
-arma::mat clusterdist(arma::mat cluster) {
-  int R = cluster.n_rows;
-  int n = cluster.n_cols;
-  arma::mat out(n,n);
-  for(int i = 0; i < n; i++) {
-    for(int j = 0; j < n; j++) {
-      out(i,j) = 0;
-    }
-  }
-  
-  for(int r = 0; r < R; r++) {
-    for(int i = 0; i < n; i++) {
-      for(int j = (i+1); j < n; j++) {
-        if(cluster(r,i)!=cluster(r,j)){
-          out(i,j) = out(i,j) + 1;
-          out(j,i) = out(i,j);
-        }
-      }
-    }
-  }
-  
-  return out;  
-}
