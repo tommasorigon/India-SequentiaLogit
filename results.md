@@ -1,7 +1,3 @@
-# Results
-Tommaso Rigon  
-09 giugno 2017  
-
 ## Results
 
 This part of the tutorial will reproduce the main results of the paper, including the computation of the DIC and WAIC indexes, the graphs and tables.
