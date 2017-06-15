@@ -1,8 +1,8 @@
 ## Results
 
-This part of the tutorial will reproduce the main results of the paper, including the computation of the DIC and WAIC indexes, the graphs and tables.
+This part of the tutorial will reproduce the main results of the paper, including the computation of the DIC and WAIC indexes, the graphs and the tables.
 
-The starting point are the file containing the results of the MCMC chain available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, as explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R).
+The starting point are the file containing the output of the MCMC algorithm, available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, as explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R).
 
 
 
