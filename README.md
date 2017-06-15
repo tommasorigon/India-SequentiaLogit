@@ -9,6 +9,7 @@ This additional documentation is organized in four sections, which should be exe
 - A [`results.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/results.md) document, in which graph and tables of Section 4 of the paper are reproduced.
 - A [`predictive_pref.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/predictive_perf.md) document, in which out-of-sample performances are computed for our model and for competing models. 
 
+In the repository we also made available the files [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) and [`core_functions.cpp`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp), which contain the function for estimating our model via MCMC.
 
 ## Shiny application
 
