@@ -2,7 +2,7 @@
 
 This repository explains in detail the computations involved in the paper [Rigon, Durante and Torelli (2016). *Bayesian semiparametric modelling of contraceptive behavior in India via sequential logistic regressions* [https://arxiv.org/abs/1405.7555]](https://arxiv.org/abs/1405.7555). The aim of this document is to fully reproduce the results of the paper and to provide additional tools (e.g. a Shiny application), which could help the reader understand the results of the proposed model.
 
-In doing so, we organized this additional documentation in four sections, which should be executed in order. The files are:
+This additional documentation is organized in four sections, which should be executed in order. The files are:
 
 - A [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) document, in which all the preliminary operations are discussed, including the original source of the data.
 - A [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document, in which the model presented in Section 3 of the paper is fitted using MCMC. We estimated also the sub-models of Section 4. Some convergence diagnostic for the MCMC chain are discussed.
