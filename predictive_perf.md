@@ -359,7 +359,7 @@ knitr::kable(round(t(tab_part1),digits = 3),format="markdown")
 |FPR               |    0.337| 0.337|   0.333|        0.335|         0.326|
 |FNR               |    0.262| 0.263|   0.254|        0.255|         0.253|
 
-![ROC curves](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/Roc_curve.png)
+![ROC curves](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/Roc_curve.jpg)
 
 ## Predictive performance: second step
 
