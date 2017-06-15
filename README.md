@@ -5,9 +5,10 @@ This repository explain in detail all operations described in the paper [Rigon, 
 In doing so, we organized this additional documentation in four sections, which should be executed in order. The files are:
 
 - A [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) document, in which all the preliminary operations are discussed, including the original source of the data.
-- A [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document, in which the model discussed in Section 3 of our paper is fitted using MCMC.
+- A [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document, in which the model presented in Section 3 of the paper is fitted using MCMC. We estimated also the sub-models of Section 4. Some convergence diagnostic for the MCMC chain are discussed.
 - A [`results.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/results.md) document, in which graph and tables of Section 4 of our paper are reproduced.
 - A [`predictive_pref.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/predictive_perf.md) document, in which out-of-sample performances are computed for our model and for competing models. 
+
 
 ## Shiny web-application
 
