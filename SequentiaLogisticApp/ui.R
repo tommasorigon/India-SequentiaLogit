@@ -2,12 +2,12 @@
 library(shinydashboard)
 
 header <- dashboardHeader(
-  title = "Sequential probability"
+  title = "Sequential probabilities"
 )
 
 body <- dashboardBody(
   fluidRow(
-    column(width = 9,
+    column(width = 7,
            box(width = NULL,
                h4("Usage Choice"),p("In the graph below is represented the posterior density of the probability of using a contraceptive method."),
                plotOutput("UsageChoice")
@@ -21,8 +21,16 @@ body <- dashboardBody(
                plotOutput("MethodChoice")
            )
     ),
-    column(width = 3,
+    column(width = 5,
            
+           box(width = NULL, status = "warning",
+               h4("Sequential probabilities"),
+               p("The values below represent the posterior estimate of the conditional probabilities associated to the sequential process."),
+               tableOutput("conditional"),
+               h4("Marginal probabilities"),
+               p("The values below represent the posterior estimate of the probabilities of the multinomial sampling. Their summation is equal to one."),
+               tableOutput("marginal")
+           ),
            box(width = NULL, status = "warning",
                selectInput("state", label = h4("State"), 
                            choices = list("Andhra Pradesh"=2,"Arunachal Pradesh"=3, "Assam"=4,    
