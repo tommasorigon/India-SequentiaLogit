@@ -11,7 +11,7 @@ In doing so, we organized this additional documentation in four sections, which 
 
 ## Shiny web-application
 
-We builded a [Shiny app](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/SequentiaLogisticApp) in which are displayed the posterior probabilities for the contraceptive usage of a given woman. The characteristic of this woman (e.g. `age`, `child`) can be defined interactively by the user.
+We builded a [Shiny application](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/SequentiaLogisticApp) in which we displayed the posterior probabilities of the contraceptive behaviour for a given woman. The characteristic of the woman (e.g. `age`, `child`, etc.) can be defined interactively by the user.
 
 The application relies on three `R` packages: `shiny`, `shinydashboard` and `ggplot2`, which should be installed in the local environment, if not already present. Then, the Shiny application can be launched by executing the following `R` code.
 
