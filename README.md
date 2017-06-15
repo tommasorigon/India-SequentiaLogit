@@ -10,7 +10,7 @@ In doing so, we organized this additional documentation in four sections, which 
 - A [`predictive_pref.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/predictive_perf.md) document, in which out-of-sample performances are computed for our model and for competing models. 
 
 
-## Shiny web-application
+## Shiny application
 
 We builded a [Shiny application](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/SequentiaLogisticApp) in which we displayed, for a given woman, the posterior probabilities of each contraceptive behaviour, as well as the sequential propabilities discussed in the paper. The characteristic of the woman (e.g. `age`, `child`, etc.) can be defined interactively by the user.
 
