@@ -21,5 +21,5 @@ The application relies on three `R` packages: `shiny`, `shinydashboard` and `ggp
 # install.packages(shinydashboard)
 # install.packages(ggplot2)
 
-runGitHub("India-SequentiaLogit","tommasorigon", subdir = "SequentiaLogisticApp")
+shiny::runGitHub("India-SequentiaLogit","tommasorigon", subdir = "SequentiaLogisticApp")
 ```
