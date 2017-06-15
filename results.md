@@ -227,7 +227,7 @@ p.spline <- ggplot(data = data.plot, aes(x = x, y = y,ymin=ymin,ymax=ymax)) + ge
 ```
 
 
-![Age effect](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/Age_effect.jpg)
+![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/Age_effect.jpg)
 
 
 #### Random effects: graphs
@@ -259,7 +259,7 @@ data.plot$k <- "Method choice"
 data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit3_dp_ranef_s$beta_RF,2, median))])
 p3 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k)
 ```
-![State effect](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/State.jpg)
+![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/State.jpg)
 
 #### Random effects: clustering States
 
@@ -392,5 +392,5 @@ final.plot$k <- "Method Choice"
 p6 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "darkred",high = "white", breaks=-6:6)
 ```
 
-![Maps](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/map.jpg)
+![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/map.jpg)
 

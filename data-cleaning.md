@@ -285,4 +285,5 @@ data.plot <- cbind(Age=15:49,melt(data.plot))
 p0 <- ggplot(data = data.plot, aes(x = Age, y = value)) + geom_point() + ylab("") + xlab("") + theme_bw() + facet_grid(~variable)
 ```
 
-![Observed frequencies](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/img/frequencies.jpg)
+![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/frequencies.jpg)
+
