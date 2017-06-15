@@ -29,7 +29,7 @@ dim(da36151.0003)
 
 ## Selection of the variable of interest
 
-Among all the $580$ variables we select only those which we will include in our analysis. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact questions posed to each eligible woman are instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables
+Among all the 580 variables we select only those which we will include in our analysis. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact questions posed to each eligible woman are instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables
 
 - `STATEID`. Relabeled as `state`, contains the name of the State.
 - `EW6`. Relabeled as `age`, represents the age of each eligible woman in 2011.
@@ -267,3 +267,22 @@ str(dataset)
 ##  $ method       : Factor w/ 4 levels "1. No contraceptive method",..: 3 4 2 2 3 2 4 3 3 1 ...
 ##  $ eligible     : Factor w/ 2 levels "(0) No 0","(1) Yes 1": 2 2 2 2 2 2 2 2 2 2 ...
 ```
+
+
+## Graph of Section 1
+
+The following commands reproduce the graph of Section 1
+
+
+```r
+library(dummies)
+library(reshape2)
+library(ggplot2)
+
+data.plot <- aggregate(dummy(dataset$method)  ~ age, mean, data = dataset)[,-1]
+colnames(data.plot) <- levels(dataset$method)
+data.plot <- cbind(Age=15:49,melt(data.plot))
+p0 <- ggplot(data = data.plot, aes(x = Age, y = value)) + geom_point() + ylab("") + xlab("") + theme_bw() + facet_grid(~variable)
+```
+
+![Observed frequencies](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/img/frequencies.png)
