@@ -5,11 +5,11 @@ Tommaso Rigon
 
 In this document we describe how to estimate the model we described in Section 3 of our paper. We implemented our algorithm in R, making use of the `Rcpp` and `RcppArmadillo` R packages for the most computationally intensive steps. The [R code](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) is made available as well as the [C++](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp) code. 
 
-**Important**. If you encounter error compiling the C++ code on a Mac Os X, this could be due to recent updates of the software `R` (version 3.4.0). Please refer to the [official R documentation](https://cloud.r-project.org/bin/macosx/tools/) for more details on this issue.
+**Important note for OS X**. If you encounter error compiling the C++ code on a Mac Os X, this could be due to recent updates of the software `R` (version 3.4.0). Please refer to the [official R documentation](https://cloud.r-project.org/bin/macosx/tools/) for more details on this issue.
 
-The Gibbs sampler for our model is contained in the function called `fit_logit`, which we will use extensively later on. As a first step, we load in memory all the required libraries and we compile the C++ code. Moreover, we load in memory also the previously obtained [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md).
+The Gibbs sampler for our model can be called using the function `fit_logit`, which we will use extensively during this document. As a first step, we load in memory all the required libraries and we compile the [C++](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp) code. Moreover, we load in memory also the previously obtained [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md), which **is not made available** in this repository.
 
-The functions `logit_ranef`, `logit_ranef_spline` and `logit_ranefDP` allow to estimate the submodels described in Section 4.1 of the paper. The function `logit_ranefDP_spline` estimates the full model. All these functions  wrapped by the global `fit_logit` function.
+The functions `logit_ranef`, `logit_ranef_spline` and `logit_ranefDP` allow to estimate the submodels described in Section 4.1 of the paper. The function `logit_ranefDP_spline` estimates the full model. All these functions are wrapped by the global `fit_logit` function.
 
 
 ```r
@@ -33,7 +33,7 @@ source("core_functions.R")
 
 ## Prior specification and estimation
 
-The prior hyperparameters for all our models, discussed in Section 3 and Section 4.1 for the submodels, is specified through a list. Fixing `P_Fix_const = 1e-2` is equivalent to set ${\bf B} = \text{diag}(100,\dots,100)$.
+The prior hyperparameters for our model and the submodels, discussed in Section 3 and Section 4.1 for the submodels, is specified through a list. Note that fixing `P_Fix_const = 1e-2` is equivalent to set **B** = (100,...,100). The name of the other terms closely recall those of the paper.
 
 
 ```r
@@ -44,7 +44,7 @@ prior = list(P_Fix_const=1e-2,
              a_alpha=.1, b_alpha=.1)
 ```
 
-Then, we set the number of MCMC iterations equal to `R= 20000` with a burn-in equal to `burn_in=2000`. We also define two `formula`: one for the specification in which `age` enters in the predictor linearly and one in which `age` is modeled using Bayesian penalized splines.
+We set the number of MCMC iterations equal to `R=20000` with a burn-in equal to `burn_in=2000`. We also define two `formula`: one for the specification in which `age` enters in the predictor linearly and one in which `age` is modeled using Bayesian penalized splines.
 
 
 ```r
@@ -57,11 +57,11 @@ f   <- as.formula(target ~ age + child + area + religion + education)
 f_s <- as.formula(target ~ child + area + religion + education)
 ```
 
-The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory without running the following steps.
+The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory directly, without running the next steps. If the reader is not interested in obtaining by itself these workspaces, he / she  can skip to the [convergence diagnostic](## Convergence diagnostic) step.
 
 #### 1. Usage choice
 
-The model and the corresponding submodels for the usage choice are estimated below. 
+The model and the corresponding submodels for the `usage choice` are estimated below. Notice that the binary outcome is referred as `target` which for the `usage choice` model is `1` if the woman is using a contraceptive method and `0` otherwise.
 
 
 ```r
@@ -79,9 +79,9 @@ fit1_dp_ranef      <- fit_logit(f,dataset$state,dataset$age,dataset,method="dp_r
 fit1_dp_ranef_s    <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="dp_ranef_s",prior,R,burn_in)
 ```
 
-#### 2. Reversible choice
+#### 2. Reversibility choice
 
-We condition to a smaller dataset of observations and therefore we select only those women who are making use of contraception.
+For the `reversibility choice` model we restrict the analysis to a smaller dataset, called `dataset2` whose observations are women who are making use of contraception. 
 
 
 ```r
@@ -105,7 +105,8 @@ fit2_dp_ranef_s    <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method=
 
 #### 3. Method choice
 
-Finally for the method choice model we perform similar steps as before.
+Finally for the `method choice` model we perform similar steps as before. For the `method choice` model we furtherly restrict the analysis to `dataset3`, a dataset whose observations are women who are making use of reversible contraception. 
+
 
 
 ```r
@@ -126,7 +127,7 @@ fit3_dp_ranef      <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="d
 fit3_dp_ranef_s    <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="dp_ranef_s",prior,R,burn_in)
 ```
 
-We end the estimation step by thinning the chains, cleaning the workspace and saving the results.
+We end the estimation step by thinning the beta coefficients, cleaning the workspace and finally saving the results in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder.
 
 
 ```r
@@ -202,10 +203,9 @@ save(fit1_dp_ranef_s,
      file="workspaces/dp_ranef_s.RData")
 ```
 
-
 ## Convergence diagnostic
 
-We load again everything in memory, on a clean workspace. Notice that the results are available also in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, if the computations are excessive. We uploaded the workspaces separately due to limitation of GitHub in file size (max 25Mb).
+We load again everything in memory, on a clean envirnoment. As previously mentioned, the results are available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, if the computations are excessive. We uploaded the workspaces separately due to limitation of GitHub in file size.
 
 
 ```r
@@ -222,6 +222,8 @@ load("workspaces/ranef_s_part3.RData")
 load("workspaces/dp_ranef.RData")
 load("workspaces/dp_ranef_s.RData")
 ```
+
+The chain are converted according the the standards of the [`coda`](https://cran.r-project.org/web/packages/coda/index.html) R package.
 
 
 ```r
@@ -242,11 +244,11 @@ beta_Fix3  <- as.mcmc(as.matrix(fit3_dp_ranef_s$beta_Fix))
 
 #### Effective sample sizes
 
-The effective sample size is monitored using the function `effectiveSize` of the [`coda`](https://cran.r-project.org/web/packages/coda/index.html) R package.
+The effective sample size is monitored using the function `effectiveSize` of the [`coda`](https://cran.r-project.org/web/packages/coda/index.html) R package. We provide a summary of these quantities, reporting the quartiles and the median for each group of coefficients.
 
 
 ```r
-# Effective sample size of random effects
+# Effective sample size of RANDOM EFFECTS
 tab1 <- round(rbind(quantile(effectiveSize(beta_RF1),c(0.25,0.5,0.75)),
 quantile(effectiveSize(beta_RF2),c(0.25,0.5,0.75)),
 quantile(effectiveSize(beta_RF3),c(0.25,0.5,0.75))))
@@ -263,7 +265,7 @@ knitr::kable(tab1,format='markdown')
 |Method choice        | 2724| 3121| 3781|
 
 ```r
-# Effective sample size of splines coefficients
+# Effective sample size of SPLINES COEFFICIENTS
 tab2 <- round(rbind(
 quantile(effectiveSize(beta_spline1),c(0.25,0.5,0.75)),
 quantile(effectiveSize(beta_spline2),c(0.25,0.5,0.75)),
@@ -281,7 +283,7 @@ knitr::kable(tab2,format='markdown')
 |Method choice        | 1733| 1838| 2135|
 
 ```r
-# Effective sample size of fixed effects
+# Effective sample size of FIXED EFFECTS
 tab3 <- round(rbind(
 quantile(effectiveSize(beta_Fix1),c(0.25,0.5,0.75)),
 quantile(effectiveSize(beta_Fix2),c(0.25,0.5,0.75)),
