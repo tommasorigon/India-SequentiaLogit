@@ -1,8 +1,10 @@
+# Results: DIC/ WAIC indexes, graphs and tables
+
 ## Results
 
 This part of the tutorial will reproduce the main results of the paper, including the computation of the DIC and WAIC indexes, the graphs and the tables.
 
-The starting point are the file containing the output of the MCMC algorithm, available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, as explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R).
+As a first step the results of the MCMC chain available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, previously obtained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the cleaned obtained in the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) step, and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R). Please note that the `dataset` **is not made available** in this GitHub repository.
 
 
 
@@ -32,7 +34,7 @@ source("core_functions.R")
 
 ## Information criteria (DIC and WAIC)
 
-Following [Gelman et al. (2014)](https://link.springer.com/article/10.1007/s11222-013-9416-2) we compute the DIC (Deviance Information Criterion) and WAIC (Watanabe-Akaike information criterion) indexes. They can be evaluated using the `IC` function, included in the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file. For each model, the IC function return both the DIC and the WAIC but also the effective degree of freedom for each model (not reported in the paper).
+Following [Gelman et al. (2014)](https://link.springer.com/article/10.1007/s11222-013-9416-2) we compute the DIC (Deviance Information Criterion) and WAIC (Watanabe-Akaike information criterion) indexes. They can be done by using the `IC` function, included in the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file. For each model, the IC function return both the DIC and the WAIC but also the effective degree of freedom for each model (not reported in the paper).
 
 Notice that the factorization of our likelihood allows to decompose the DIC and WAIC indexes, that is
 
@@ -42,11 +44,11 @@ and similarly
 
 > WAIC = WAIC_Usage + WAIC_Reversibility + WAIC_Method
 
-The construction of the table is as follows:
+The construction of the table of section 4 is as follows:
 
 
 ```r
-# Construction of the table. The part "c(1,2)" select the row of the DIC and the WAIC.
+# Construction of the table. The part "c(1,2)" select the rows for the DIC and the WAIC.
 tab <- cbind(c(IC(fit1_ranef)[c(1,2)],
         IC(fit1_ranef_s)[c(1,2)],
         IC(fit1_dp_ranef)[c(1,2)],
@@ -63,6 +65,12 @@ tab <- cbind(c(IC(fit1_ranef)[c(1,2)],
 tab <- rbind(tab[2*(1:4)-1,],-2*tab[2*(1:4),]) # Rearrange for graphical reason
 tab <- data.frame(rep(c("baseline","splines","DP", "DP + splines"),2),
                   round(tab,digits=2), round(rowSums(tab),digits=2))
+```
+
+The DIC index is finally printed below:
+
+
+```r
 colnames(tab) <- c("DIC","Usage choice","Reversibility choice","Method choice","Total")
 knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
 ```
@@ -75,6 +83,8 @@ knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
 |splines      |     27271.13|             18166.32|       7658.78| 53096.23|
 |DP           |     27557.82|             18241.65|       7718.56| 53518.03|
 |DP + splines |     27260.91|             18177.30|       7665.86| 53104.07|
+
+Similarly, the WAIC index can be printed with the following command:
 
 
 ```r
@@ -91,8 +101,9 @@ knitr::kable(tab[5:8,],format="markdown",row.names = FALSE)
 |DP           |     27558.86|             18239.77|       7716.12| 53514.75|
 |DP + splines |     27261.94|             18174.20|       7663.44| 53099.58|
 
+#### Effective degrees of freedom 
 
-Here, we report also the **effective degrees of freedom** for each model, according to both the DIC and the WAIC.
+In this document, we report also the **effective degrees of freedom** for each model, according to both the DIC and the WAIC.
 
 
 ```r
@@ -113,6 +124,12 @@ tab <- cbind(c(IC(fit1_ranef)[c(4,5)],
 tab <- rbind(tab[2*(1:4)-1,],tab[2*(1:4),]) # Rearrange for graphical reason.
 tab <- data.frame(rep(c("baseline","splines","DP", "DP + splines"),2),
                   round(tab,digits=2),round(rowSums(tab),digits=2))
+```
+
+For the DIC we have
+
+
+```r
 colnames(tab) <- c("Effective degree of freedom - DIC","Usage choice",
                    "Reversibility choice","Method choice","Total")
 knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
@@ -127,6 +144,7 @@ knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
 |DP                                |        36.74|                40.32|         40.74| 117.81|
 |DP + splines                      |        42.06|                48.58|         43.83| 134.47|
 
+Similarly, for the WAIC
 
 
 ```r
@@ -144,9 +162,9 @@ knitr::kable(tab[5:8,],format="markdown",row.names = FALSE)
 |DP                                 |        37.78|                38.45|         38.31| 114.54|
 |DP + splines                       |        43.09|                45.48|         41.41| 129.97|
 
-## Fixed effects
+## Fixed effects table
 
-In the following, we compute the posterior mean of the fixed effect coefficients, together with 0.95% credible interval for each coefficient. 
+In the following, we compute the posterior mean of the fixed effect coefficients, together with a 0.95% credible interval. 
 
 
 ```r
@@ -186,12 +204,10 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 ## Age effect
 
-The `age` effect is obtained by computing the posterior mean of each function f_k(). The first step consists in constructing the B-spline basis function evaluated among the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package.
+The `age` effect is obtained by computing the posterior mean of each function f_k(). The first step consists in constructing the B-spline basis function evaluated among the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package. In the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file, the construction of the `B` matrix proceeds exactly in the same way. 
 
 
 ```r
-# B-spline basis construction
-
 # Knots placement
 inner_knots <- 40; degree <- 3
 xl    <- min(dataset$age); xr <- max(dataset$age); dx <- (xr - xl) / (inner_knots-1)
@@ -199,7 +215,23 @@ knots <- seq(xl - degree * dx, xr + degree * dx, by = dx)
 
 # Fixed quantities
 B        <- spline.des(knots, 15:49, degree + 1, 0 * 15:49, outer.ok=TRUE)$design
+```
 
+The final number of columns of `B`, to which is associated an equal number of coefficients, is
+
+
+```r
+ncol(B)
+```
+
+```
+## [1] 42
+```
+
+Then, the graph can be obtained then as follow
+
+
+```r
 # Posterior sample for each f_k()
 eta1_spline <- t(B%*%t(fit1_dp_ranef_s$beta_spline))
 eta2_spline <- t(B%*%t(fit2_dp_ranef_s$beta_spline))
@@ -226,7 +258,9 @@ p.spline <- ggplot(data = data.plot, aes(x = x, y = y,ymin=ymin,ymax=ymax)) + ge
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/Age_effect.jpg)
 
 
-#### Random effects: graphs
+## Random effects: graphs
+
+In the following, we reproduce the boxplots for the random effects.
 
 
 ```r
@@ -239,7 +273,6 @@ data.plot$k <- "Usage choice"
 # Ordering the levels according to the median
 data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit1_dp_ranef_s$beta_RF,2, median))])
 p1 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) 
-
 
 # Reversibility choice
 data.plot <- melt(as.matrix(fit2_dp_ranef_s$beta_RF))
@@ -255,11 +288,12 @@ data.plot$k <- "Method choice"
 data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit3_dp_ranef_s$beta_RF,2, median))])
 p3 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k)
 ```
+
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/State.jpg)
 
-#### Random effects: clustering States
+## Random effects: clustering States
 
-Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `mcclust` allows to reproduce the work of [Medvedovic et al. (2002)](https://pdfs.semanticscholar.org/d50c/9701d0aa5136d28f992f9464d58c5b7552fb.pdf).
+Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `medv` function allows to reproduce the work of [Medvedovic et al. (2002)](https://pdfs.semanticscholar.org/d50c/9701d0aa5136d28f992f9464d58c5b7552fb.pdf).
 
 The following chunk of code allows to obtained the cluster labels for the `Usage choice`, `Reversibility choice` and the `Method choice` models.
 
@@ -279,13 +313,13 @@ clust2_medv  <- medv(distance2)
 clust3_medv  <- medv(distance3)
 ```
 
-The graphical representation of India requires additional external files, which are not provided in the GitHub repository, but can be dowloaded for free from the [Global Administrative Areas](http://www.gadm.org/) website. We downloaded the data for India in the `shapefile` format. See the link above for further information about the data source.
+The graphical representation of India requires additional external files, which **are not provided** in the GitHub repository, but can be dowloaded for free from the [Global Administrative Areas](http://www.gadm.org/) website. We downloaded the data for India in the `shapefile` format. Refer to the documentation of the [Global Administrative Areas](http://www.gadm.org/) for further information about the data source.
 
-In order to make the map data compatible with ours, there are some extra steps to do. Having loaded the data in memory, we compare which States available in the map are not included in the survey. In many cases, it is just a matter of relabeling (e.g. from `Dadra and Nagar Haveli` to `Dadra+Nagar Haveli`). However, some cases require special attention:
+In order to make the map data compatible with ours, there are some extra steps to do. Having loaded the data in memory, we compare which States is present in the map but not included in the survey. In many cases, it is just a matter of relabeling (e.g. from `Dadra and Nagar Haveli` to `Dadra+Nagar Haveli`). However, some cases require special attention:
 
-1. As mentioned, `Dadra and Nagar Haveli`, `Daman and Diu`, `Jammu and Kashmir`,`Odisha` and `Puducherry` are relabelled to be coherent with the names of the our survey.
-2. For `Andaman and Nicobar` and `Lakshadweep` -both small islands- we do not have any observation in our dataset, and they will be ignored.
-3. `Telengana` is gropued with `Andhra Pradesh`. In fact, `Telengana` became a separate recently, but at the time of the interview it was part of `Andhra Pradesh`.
+1. As mentioned, `Dadra and Nagar Haveli`, `Daman and Diu`, `Jammu and Kashmir`,`Odisha` and `Puducherry` can be relabelled to be coherent with the names of the our survey.
+2. For `Andaman and Nicobar` and `Lakshadweep`, both small islands, we do not have any observation in our dataset, and they will be ignored.
+3. `Telengana` is grouped with `Andhra Pradesh`. In fact, `Telengana` became a separate State recently, but at the time of the interview it was part of `Andhra Pradesh`.
 
 
 ```r
@@ -341,7 +375,7 @@ states.shp$NAME_1 <- as.factor(states.shp$NAME_1)
 states.shp.f <- fortify(states.shp, region = "ID_1")
 ```
 
-The graph are obtained as follow, computing the mean of the posterior means. The baseline State `Uttar Pradesh` was fixed equal to 0. 
+The graph are obtained as follow, computing the mean of the posterior means. The baseline State `Uttar Pradesh` was fixed equal to 0.
 
 
 ```r
