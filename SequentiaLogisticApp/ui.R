@@ -2,22 +2,22 @@
 library(shinydashboard)
 
 header <- dashboardHeader(
-  title = "Sequential probabilities"
+  title = "Shiny App"
 )
 
 body <- dashboardBody(
   fluidRow(
     column(width = 7,
            box(width = NULL,
-               h4("Usage Choice"),p("In the graph below is represented the posterior density of the probability of using a contraceptive method."),
+               h4("Usage Choice"),p("In the graph below is represented the posterior density of the conditional probability of using a contraceptive method."),
                plotOutput("UsageChoice")
            ),
            box(width = NULL,
-               h4("Reversible Choice"),p("In the graph below is represented the posterior density of the probability of using a reversible method, provided that a contraceptive method was used."),
+               h4("Reversibility Choice"),p("In the graph below is represented the posterior density of the conditional probability of using a reversible method, provided that a contraceptive method was used."),
                plotOutput("ReversibleChoice")
            ),
            box(width = NULL,
-               h4("Method Choice"),p("In the graph below is represented the posterior density of the probability of using a traditional method, provided that a reversible contraceptive method was used."),
+               h4("Method Choice"),p("In the graph below is represented the posterior density of the conditional probability of using a traditional (natural) method, provided that a reversible contraceptive method was used."),
                plotOutput("MethodChoice")
            )
     ),
@@ -56,7 +56,7 @@ body <- dashboardBody(
                             choices = list("None" = 2, "One" = 3, "More than one" = 1), 
                             selected = 1),
                radioButtons("area", label = h4("Area"),
-                            choices = list("rural" = 1, "urban" = 2), 
+                            choices = list("Rural" = 1, "Urban" = 2), 
                             selected = 1),
                radioButtons("religion", label = h4("Religion"),
                             choices = list("Hindu" = 1, "Muslim" = 2, "Christian" = 3,"Other" = 4), 
