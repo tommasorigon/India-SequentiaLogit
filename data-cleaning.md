@@ -1,5 +1,4 @@
 # Preliminary operations for the IHDS-II dataset
-Tommaso Rigon  
 
 
 

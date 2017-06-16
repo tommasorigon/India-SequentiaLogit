@@ -1,5 +1,4 @@
-# Estimation and Diagnostic
-Tommaso Rigon  
+# Estimation and convergence diagnostic
 
 ## Description
 
