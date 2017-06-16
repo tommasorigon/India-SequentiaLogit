@@ -1,18 +1,18 @@
 # Predictive performance
-Tommaso Rigon  
 
 ## Description
 
 In this document we describe how to reproduce the predictive performance discussed in Section 4 of our paper.
 
-**Important**. If you encounter error compiling the C++ code on a Mac Os X, this could be due to recent updates of the software `R` (version 3.4.0). Please refer to the [official R documentation](https://cloud.r-project.org/bin/macosx/tools/) for more details on this issue.
+**Important note for OS X**. If you encounter error compiling the C++ code on a Mac Os X, this could be due to recent updates of the software `R` (version 3.4.0). Please refer to the [official R documentation](https://cloud.r-project.org/bin/macosx/tools/) for more details on this issue.
 
-
-The first part of this document follows closely the estimation of the full model explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md)  document. However, we will estimate all the models and submodels only on a fraction of the data (about the 75%).
+The first part of this document follows closely the estimation of the full model explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. However, we will estimate all the models and submodels only on a fraction of the data (about the 75%).
 
 The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory without running the following step. 
 
 ## Model estimation
+
+We do not enters in the detail of the following code chunk, since it is almost an exact copy of the one used in the [`estimation.md`]((https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md)) file. However, please note that the models are estimated using a `data_training` dataset. The validation set is stored, instead, the `data_validation` dataset.
 
 
 ```r
@@ -184,7 +184,7 @@ save(data_training,
 
 ## Predictive performance
 
-As explained in our paper, the predictive performance are obtained in two steps. We load in memory the required workspaces, as well as the required libraries. Moreover, we define the functions for computing, for istance, the misclassification rate.
+As explained in our paper, the predictive performance are obtained in two steps. We load in memory the required workspaces, as well as the required libraries. Moreover, we define the functions for computing the misclassification rate and other relevant measures.
 
 
 ```r
@@ -237,13 +237,17 @@ fnr <- function(pred,target,cutoff=0.5){
 }
 ```
 
-Finally, we compute some other quantity of interest and we define different validation stes. The `data_validation2` object defined below is a `data.frame` of women that are using a contraceptive method and that were not used during the estimation process.
+Finally, we compute some other quantity of interest (e.g. the design matrix on the validation set). The `data_validation2` object defined below is a `data.frame` of women that are using a contraceptive method and that are a subset of the validation set contained in the `data_validation` dataframe.
 
 
 ```r
 inner_knots <- 40; degree <- 3
 xl          <- min(data_training$age); xr <- max(data_training$age); dx <- (xr - xl) / (inner_knots-1)
 knots       <- seq(xl - degree * dx, xr + degree * dx, by = dx)
+
+##############
+# First step
+##############
 
 # DP + splines and Gaussian + splines.
 B_val        <- spline.des(knots, data_validation$age, degree + 1, 0 * data_validation$age, outer.ok=TRUE)$design
@@ -254,20 +258,21 @@ X_val_Fix    <- model.matrix(method ~ child + area + religion + education, data 
 X_val_RF2   <- dummy(data_validation$state)
 X_val_Fix2  <- model.matrix(method ~ age + child + area + religion + education, data = data_validation)[,-1]
 
-# Second partdata_validation2            <- data_validation[data_validation$method != "1. No contraceptive method",]
+###############
+# Second step 
+###############
 data_validation2            <- data_validation[data_validation$method != "1. No contraceptive method",]
 data_validation2$method     <- factor(data_validation2$method)
 
-# DP + splines and Gaussian + splines. Age omitted as well as the first Gaussian random effect.
+# DP + splines and Gaussian + splines. 
 B_val2        <- spline.des(knots, data_validation2$age, degree + 1, 0 * data_validation2$age, outer.ok=TRUE)$design
 X_val2_RF   <- dummy(data_validation2$state,drop = FALSE)[,-1]
 X_val2_Fix  <- model.matrix(method ~ child + area + religion + education, data = data_validation2)[,-1]
 
-# DP + Gaussian. Age included and all the effects included as well.
+# DP + Gaussian. 
 X_val2_RF2   <- dummy(data_validation2$state,drop=FALSE)
 X_val2_Fix2  <- model.matrix(method ~ age + child + area + religion + education, data = data_validation2)[,-1]
 ```
-
 
 ## Predictive performance: first step
 
@@ -301,7 +306,7 @@ rho1_ranger <- predict(fit_ranf1,data=data_validation,type="response")$predictio
 
 #### ROC curve and performances
 
-For each model, we computed the AUC, the misclassification rate, the false positive and negative rates. The ROC curves for each model are computed and the performance indexes are reported in the table below.
+For each model, we computed the AUC, the misclassification rate, the false positive and negative rates. The ROC curves for each model are computed and the performance indexes are reported in the table below. For the misclassification, we used a `cutoff=0.75` in order to obtain a balance between false positive and false negative.
 
 
 ```r
@@ -324,7 +329,6 @@ p7 <- ggplot(rocdata, aes(m = prediction, d = out, col = Model)) + geom_roc(n.cu
 # AUC
 part1_AUC <- calc_auc(p7)$AUC
 
-# Misclassification, FPR,FNR,
 cutoff    <- 0.75 
 part1_misclass <- c(missclass(rho1_rf,target_val,cutoff),
                     missclass(rho1_dp,target_val,cutoff),
@@ -371,6 +375,7 @@ rho2 <- 1/(1+exp(-(X_val2_RF%*%t(fit2_dp_ranef_s$beta_RF) + B_val2%*%t(fit2_dp_r
 rho3 <- 1/(1+exp(-(X_val2_RF%*%t(fit3_dp_ranef_s$beta_RF) + B_val2%*%t(fit3_dp_ranef_s$beta_spline) + X_val2_Fix%*%t(fit3_dp_ranef_s$beta_Fix))))
 rho4 <- 1 - rho3
 
+# DP + splines
 prob_dp_s <- data.frame(Sterilization    =  rowMeans(1 - rho2),
                    TraditionalMethods    =  rowMeans(rho2*rho4), 
                    ModernMethods         =  rowMeans(rho2*rho3))
@@ -379,15 +384,15 @@ prob_dp_s <- data.frame(Sterilization    =  rowMeans(1 - rho2),
 rho2 <- 1/(1+exp(-(X_val2_RF%*%t(fit2_ranef_s$beta_RF) + B_val2%*%t(fit2_ranef_s$beta_spline) + X_val2_Fix%*%t(fit2_ranef_s$beta_Fix))))
 rho3 <- 1/(1+exp(-(X_val2_RF%*%t(fit3_ranef_s$beta_RF) + B_val2%*%t(fit3_ranef_s$beta_spline) + X_val2_Fix%*%t(fit3_ranef_s$beta_Fix))))
 rho4 <- 1 - rho3
-prob_rf_s <- data.frame(Sterilization    =  rowMeans(1 - rho2),
-                           TraditionalMethods    =  rowMeans(rho2*rho4), 
-                           ModernMethods         =  rowMeans(rho2*rho3))
+prob_rf_s <- data.frame(Sterilization         =  rowMeans(1 - rho2),
+                        TraditionalMethods    =  rowMeans(rho2*rho4), 
+                        ModernMethods         =  rowMeans(rho2*rho3))
 
 # Gaussian
 rho2 <- 1/(1+exp(-(X_val2_RF2%*%t(fit2_ranef$beta_RF) + X_val2_Fix2%*%t(fit2_ranef$beta_Fix))))
 rho3 <- 1/(1+exp(-(X_val2_RF2%*%t(fit3_ranef$beta_RF) + X_val2_Fix2%*%t(fit3_ranef$beta_Fix))))
 rho4 <- 1-rho3
-prob_rf <- data.frame(Sterilization    =  rowMeans(1 - rho2),
+prob_rf <- data.frame(Sterilization         =  rowMeans(1 - rho2),
                       TraditionalMethods    =  rowMeans(rho2*rho4), 
                       ModernMethods         =  rowMeans(rho2*rho3))
 
@@ -395,12 +400,12 @@ prob_rf <- data.frame(Sterilization    =  rowMeans(1 - rho2),
 rho2 <- 1/(1+exp(-(X_val2_RF2%*%t(fit2_dp_ranef$beta_RF) + X_val2_Fix2%*%t(fit2_dp_ranef$beta_Fix))))
 rho3 <- 1/(1+exp(-(X_val2_RF2%*%t(fit3_dp_ranef$beta_RF) + X_val2_Fix2%*%t(fit3_dp_ranef$beta_Fix))))
 rho4 <- 1-rho3
-prob_dp <- data.frame(Sterilization    =  rowMeans(1 - rho2),
+prob_dp <- data.frame(Sterilization         =  rowMeans(1 - rho2),
                       TraditionalMethods    =  rowMeans(rho2*rho4), 
                       ModernMethods         =  rowMeans(rho2*rho3))
 ```
 
-#### Oliveira model
+#### De Oliveira et al. (2004) model
 
 A multinomial model is estimated in order to reproduce the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). The variable `state`] enters in the multinomial specification a a fixed effect. As explained in the paper, the variable `age` enters in the model via a piecewise constant specification.
 
@@ -440,7 +445,7 @@ prob_multinom <- predict(fit_multinom,newdata=data_validation2,type="probs")
 
 #### Random forest
 
-As before, the random forest obtained using the `ranger` R package.
+As before, the random forest are obtained using the `ranger` R package.
 
 
 ```r
