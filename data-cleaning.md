@@ -5,11 +5,11 @@ Tommaso Rigon
 
 ## The Indian Human Development Survey-II (IHDS-II)
 
-This short document explain in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset in the paper [Rigon, Durante and Torelli (2016). *Bayesian semiparametric modelling of contraceptive behavior in India via sequential logistic regressions* [https://arxiv.org/abs/1405.7555]](https://arxiv.org/abs/1405.7555). From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
+This short document explain in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset in our paper. From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
 
 > The India Human Development Survey-II (IHDS-II), 2011-12 is a nationally representative, multi-topic survey of 42,152 households in 1,420 villages and 1,042 urban neighborhoods across India. These data are mostly re-interviews of households interviewed for IHDS (ICPSR 22626) in 2004-05.
 
-We cannot re-distribute the data, but they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is completely free. 
+We cannot redistribute the data, but they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is completely free. 
 
 We have used the dataset called **DS3: Eligible Women**. Eligible women are ever-married women aged 15 - 49. Those ever-married women older than 49 years that were interviewed in the initial IHDS wave, **are included in the dataset even if they are not eligible anymore**.
 
@@ -31,7 +31,7 @@ dim(da36151.0003)
 
 Among all the 580 variables we select only those which we will include in our analysis. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact questions posed to each eligible woman are instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables
 
-- `STATEID`. Relabeled as `state`, contains the name of the State.
+- `STATEID`. Relabeled as `state`, represents the name of the State where each woman lives.
 - `EW6`. Relabeled as `age`, represents the age of each eligible woman in 2011.
 - `EW8`. Relabeled as `education`, represents the year of education completed (illiterate=00,5th class=05, bachelors=15, above bachelors=16).
 - `EW9`. Relabeled as `child`, represents the number of children alive.
@@ -94,7 +94,7 @@ table(dataset$pregnant, dataset$contraceptive, useNA="always")
 ##   <NA>            28         5  1718
 ```
 
-We decided to exclude from the analysis pregnant women (`1700`) and those women who do not declared their pregnancy status (`1718 + 28 + 5`), comprising a total of `1700 + 1718 + 28 + 5 = 4185` cases. The `28 + 5 = 33` missing cases ---reported in the table above--- are women who declared to be `unsure` about their pregnancy status; we holded them out from the dataset as well.
+We decided to exclude from the analysis pregnant women (`1700`) and those women who do not declared their pregnancy status (`1718 + 28 + 5`), comprising a total of `1700 + 1718 + 28 + 5 = 4185` cases. The `28 + 5 = 33` missing cases, reported in the table above, are women who declared to be `unsure` about their pregnancy status; we holded them out from the dataset as well.
 
 
 ```r
@@ -191,7 +191,7 @@ Then, we grouped some of the covariates labels as follow:
 
 - `education`. We create a four level factor for education (No education, Low , Intermediate and High).
 - `religion`. We considered the most frequent religions in India (Hindu, Muslim, Christian), and we gropued the other religions together.
-- `child`. We considered a three level factor for the number of child: none, one or more than one. The \texttt{More than 1} category is fixed as baseline.
+- `child`. We considered a three level factor for the number of child: none, one or more than one. The `More than 1` category is fixed as baseline.
 
 
 
@@ -269,9 +269,9 @@ str(dataset)
 ```
 
 
-## Graph of Section 1
+## Descriptive analysis
 
-The following commands reproduce the graph of Section 1
+The following commands reproduce the graph of Section one of our paper.
 
 
 ```r
