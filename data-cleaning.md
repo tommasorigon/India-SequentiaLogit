@@ -10,7 +10,7 @@ This short document explain in detail all the preliminary operations performed t
 
 We cannot redistribute the data, but they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is completely free. 
 
-We have used the dataset called **DS3: Eligible Women**. Eligible women are ever-married women aged 15 - 49. Those ever-married women older than 49 years that were interviewed in the initial IHDS wave, **are included in the dataset even if they are not eligible anymore**.
+We have used the dataset called **DS3: Eligible Women**. Eligible women are ever-married women aged 15 - 49. Those ever-married women older than 49 years that were interviewed in the initial IHDS wave, **are included in the dataset even if they are not eligible anymore**. Non-eligible women will be excluded from the dataset.
 
 
 ```r
@@ -282,7 +282,11 @@ data.plot <- aggregate(dummy(dataset$method)  ~ age, mean, data = dataset)[,-1]
 colnames(data.plot) <- levels(dataset$method)
 data.plot <- cbind(Age=15:49,melt(data.plot))
 p0 <- ggplot(data = data.plot, aes(x = Age, y = value)) + geom_point() + ylab("") + xlab("") + theme_bw() + facet_grid(~variable)
+
+ggsave("img/frequencies.pdf",p0,device="pdf",width=12,height=4)
+ggsave("img/frequencies.jpg",p0,device="jpg",width=12,height=4)
 ```
 
-![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/frequencies.jpg)
+<!-- ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/frequencies.jpg) -->
+
 
