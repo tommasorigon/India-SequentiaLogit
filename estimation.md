@@ -75,13 +75,15 @@ tab[2,3] <- 1/mean(tapply(coef3_glm,cutree(cl,3),var))
 
 colnames(tab) <- c("Usage choice","Reversibility choice","Method choice")
 rownames(tab) <- c("Precision of the cluster means","Precision within the cluster")
-knitr::kable(tab)
+knitr::kable(tab,format='markdown')
 ```
 
-                                  Usage choice   Reversibility choice   Method choice
--------------------------------  -------------  ---------------------  --------------
-Precision of the cluster means       0.2333634              0.0215313       0.0111064
-Precision within the cluster         5.0992340              1.1460989       1.6656611
+
+
+|                               | Usage choice| Reversibility choice| Method choice|
+|:------------------------------|------------:|--------------------:|-------------:|
+|Precision of the cluster means |    0.2333634|            0.0215313|     0.0111064|
+|Precision within the cluster   |    5.0992340|            1.1460989|     1.6656611|
 
 The prior hyperparameters for our model and the submodels, discussed in Section 3 and Section 4.1 for the submodels, is specified through a list. Note that fixing `P_Fix_const = 1e-2` is equivalent to set **B** = (100,...,100). We derived different prior distribution for the `usage choice` model, the `reversibility choice` and the `method choice` model, basing this decision on the table reported above.
 
