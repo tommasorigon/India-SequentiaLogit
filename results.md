@@ -4,7 +4,7 @@
 
 This part of the tutorial will reproduce the main results of the paper, including the computation of the DIC and WAIC indexes, the graphs and the tables.
 
-As a first step the results of the MCMC chain available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, previously obtained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the cleaned obtained in the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) step, and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R). Please note that the `dataset` **is not made available** in this GitHub repository.
+The results of the MCMC chain available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, previously obtained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the cleaned obtained in the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) step, and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R). Please note that the `dataset` **is not made available** in this GitHub repository.
 
 
 
@@ -13,6 +13,7 @@ library(dplyr)     # Required to manipulate the dataset
 library(splines)   # Required for computing the B-spline basis
 library(reshape2)  # Manipulating data
 library(ggplot2)   # Graphical library
+library(gridExtra)
 
 # Load the results of the MCMC chain
 rm(list=ls())
@@ -22,9 +23,7 @@ load("dataset.RData")
 
 # Load the results of the MCMC chain
 load("workspaces/ranef.RData")
-load("workspaces/ranef_s_part1.RData")
-load("workspaces/ranef_s_part2.RData")
-load("workspaces/ranef_s_part3.RData")
+load("workspaces/ranef_s.RData")
 load("workspaces/dp_ranef.RData")
 load("workspaces/dp_ranef_s.RData")
 
@@ -79,10 +78,10 @@ knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
 
 |DIC          | Usage choice| Reversibility choice| Method choice|    Total|
 |:------------|------------:|--------------------:|-------------:|--------:|
-|baseline     |     27565.16|             18238.23|       7710.10| 53513.49|
-|splines      |     27271.13|             18166.32|       7658.78| 53096.23|
-|DP           |     27557.82|             18241.65|       7718.56| 53518.03|
-|DP + splines |     27260.91|             18177.30|       7665.86| 53104.07|
+|baseline     |     27566.32|             18236.22|       7705.81| 53508.34|
+|splines      |     27271.78|             18168.30|       7653.94| 53094.02|
+|DP           |     27560.77|             18237.09|       7706.53| 53504.39|
+|DP + splines |     27266.00|             18169.71|       7655.00| 53090.72|
 
 Similarly, the WAIC index can be printed with the following command:
 
@@ -96,10 +95,10 @@ knitr::kable(tab[5:8,],format="markdown",row.names = FALSE)
 
 |WAIC         | Usage choice| Reversibility choice| Method choice|    Total|
 |:------------|------------:|--------------------:|-------------:|--------:|
-|baseline     |     27565.31|             18236.33|       7706.67| 53508.31|
-|splines      |     27271.28|             18163.70|       7655.49| 53090.47|
-|DP           |     27558.86|             18239.77|       7716.12| 53514.75|
-|DP + splines |     27261.94|             18174.20|       7663.44| 53099.58|
+|baseline     |     27566.34|             18233.97|       7703.70| 53504.01|
+|splines      |     27271.86|             18166.05|       7651.82| 53089.72|
+|DP           |     27561.54|             18234.49|       7701.41| 53497.43|
+|DP + splines |     27266.83|             18166.44|       7650.32| 53083.60|
 
 #### Effective degrees of freedom 
 
@@ -139,10 +138,10 @@ knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
 
 |Effective degree of freedom - DIC | Usage choice| Reversibility choice| Method choice|  Total|
 |:---------------------------------|------------:|--------------------:|-------------:|------:|
-|baseline                          |        42.23|                41.24|         39.83| 123.30|
-|splines                           |        48.59|                46.05|         43.61| 138.25|
-|DP                                |        36.74|                40.32|         40.74| 117.81|
-|DP + splines                      |        42.06|                48.58|         43.83| 134.47|
+|baseline                          |        42.39|                40.26|         37.05| 119.70|
+|splines                           |        47.80|                44.22|         39.97| 131.98|
+|DP                                |        40.21|                40.85|         40.11| 121.18|
+|DP + splines                      |        45.55|                45.40|         42.76| 133.72|
 
 Similarly, for the WAIC
 
@@ -157,10 +156,10 @@ knitr::kable(tab[5:8,],format="markdown",row.names = FALSE)
 
 |Effective degree of freedom - WAIC | Usage choice| Reversibility choice| Method choice|  Total|
 |:----------------------------------|------------:|--------------------:|-------------:|------:|
-|baseline                           |        42.39|                39.34|         36.39| 118.12|
-|splines                            |        48.75|                43.42|         40.32| 132.49|
-|DP                                 |        37.78|                38.45|         38.31| 114.54|
-|DP + splines                       |        43.09|                45.48|         41.41| 129.97|
+|baseline                           |        42.41|                38.02|         34.94| 115.37|
+|splines                            |        47.88|                41.97|         37.84| 127.69|
+|DP                                 |        40.98|                38.25|         34.99| 114.22|
+|DP + splines                       |        46.38|                42.13|         38.08| 126.59|
 
 ## Fixed effects table
 
@@ -191,15 +190,15 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 |             | Usage (mean)| Usage (lower)| Usage (upper)| Reversibility (mean)| Reversibility (lower)| Reversibility (upper)| Method (mean)| Method (lower)| Method (upper)|
 |:------------|------------:|-------------:|-------------:|--------------------:|---------------------:|---------------------:|-------------:|--------------:|--------------:|
-|no child     |        -3.71|         -3.88|         -3.55|                 2.19|                  1.67|                  2.72|         -0.17|          -0.59|           0.26|
-|one child    |        -1.37|         -1.45|         -1.29|                 2.19|                  2.06|                  2.33|         -0.18|          -0.33|          -0.03|
-|urban        |         0.24|          0.16|          0.31|                 0.29|                  0.20|                  0.38|          0.45|           0.32|           0.57|
-|muslim       |        -0.43|         -0.52|         -0.34|                 1.24|                  1.12|                  1.36|          0.13|          -0.04|           0.29|
-|christian    |        -0.27|         -0.49|         -0.05|                 0.01|                 -0.29|                  0.30|          0.38|          -0.11|           0.90|
-|other        |         0.08|         -0.14|          0.29|                 0.46|                  0.25|                  0.68|          0.26|          -0.02|           0.55|
-|low          |         0.14|          0.04|          0.23|                 0.09|                 -0.02|                  0.21|          0.43|           0.26|           0.61|
-|intermediate |         0.19|          0.11|          0.27|                 0.51|                  0.41|                  0.60|          0.71|           0.56|           0.86|
-|high         |         0.26|          0.15|          0.37|                 1.29|                  1.15|                  1.42|          1.16|           0.98|           1.34|
+|no child     |        -3.71|         -3.88|         -3.55|                 2.20|                  1.70|                  2.77|         -0.19|          -0.60|           0.24|
+|one child    |        -1.37|         -1.45|         -1.28|                 2.19|                  2.06|                  2.33|         -0.19|          -0.34|          -0.04|
+|urban        |         0.24|          0.17|          0.31|                 0.29|                  0.21|                  0.38|          0.44|           0.31|           0.57|
+|muslim       |        -0.43|         -0.52|         -0.34|                 1.24|                  1.13|                  1.36|          0.13|          -0.03|           0.28|
+|christian    |        -0.26|         -0.48|         -0.03|                 0.00|                 -0.29|                  0.29|          0.36|          -0.13|           0.88|
+|other        |         0.09|         -0.11|          0.29|                 0.45|                  0.26|                  0.65|          0.30|           0.03|           0.59|
+|low          |         0.14|          0.05|          0.23|                 0.08|                 -0.03|                  0.20|          0.43|           0.26|           0.60|
+|intermediate |         0.20|          0.12|          0.27|                 0.50|                  0.41|                  0.60|          0.71|           0.56|           0.85|
+|high         |         0.26|          0.16|          0.38|                 1.28|                  1.15|                  1.41|          1.16|           0.98|           1.34|
 
 
 ## Age effect
@@ -252,6 +251,9 @@ data.plot <- rbind(data.plot,data.frame(x=15:49,y=apply(eta3_spline,2,mean),
                                         k="Method choice"))
 
 p.spline <- ggplot(data = data.plot, aes(x = x, y = y,ymin=ymin,ymax=ymax)) + geom_line()  +theme_bw()+ xlab("") + ylab("") + geom_ribbon(alpha=0.25) + facet_grid(.~k)
+
+ggsave("img/Age_effect.pdf",p.spline,device="pdf",width=15,height=5)
+ggsave("img/Age_effect.jpg",p.spline,device="jpg",width=15,height=5)
 ```
 
 
@@ -279,38 +281,54 @@ data.plot <- melt(as.matrix(fit2_dp_ranef_s$beta_RF))
 data.plot$k <- "Reversibility choice"
 # Ordering the levels according to the median
 data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit2_dp_ranef_s$beta_RF,2, median))])
-p2 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) 
+p2 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) + ylim(c(-10,10))
 
 # Method choice
 data.plot <- melt(as.matrix(fit3_dp_ranef_s$beta_RF))
 data.plot$k <- "Method choice"
 # Ordering the levels according to the median
 data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit3_dp_ranef_s$beta_RF,2, median))])
-p3 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k)
+p3 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) +ylim(-3,15)
+
+ggsave("img/State.pdf",grid.arrange(p1,p2,p3,ncol=1),device="pdf",width=13,height=15)
+ggsave("img/State.jpg",grid.arrange(p1,p2,p3,ncol=1),device="jpg",width=13,height=15)
 ```
 
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/State.jpg)
 
-## Random effects: clustering States
+## Random effects: India map
 
-Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `medv` function allows to reproduce the work of [Medvedovic et al. (2002)](https://pdfs.semanticscholar.org/d50c/9701d0aa5136d28f992f9464d58c5b7552fb.pdf).
+Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `laugreen` function allows to reproduce the work of [Lau and Green (2007)](https://www.jstor.org/stable/27594259).
 
-The following chunk of code allows to obtained the cluster labels for the `Usage choice`, `Reversibility choice` and the `Method choice` models.
+The following chunk of code allows to obtained the cluster labels for the `Usage choice`, `Reversibility choice` and the `Method choice` models. The output of the clustering procedure is omitted, but the is reported below as well 
 
 
 ```r
 library(mcclust)
 
 # First of all, we compute the dissimilarity matrix between States based on the MCMC labels
-thinning <- 5*(1:4000)
-distance1 <- comp.psm(fit1_dp_ranef_s$S[thinning,])
-distance2 <- comp.psm(fit2_dp_ranef_s$S[thinning,])
-distance3 <- comp.psm(fit3_dp_ranef_s$S[thinning,])
+distance1 <- comp.psm(fit1_dp_ranef_s$S)
+distance2 <- comp.psm(fit2_dp_ranef_s$S)
+distance3 <- comp.psm(fit3_dp_ranef_s$S)
 
-# Clustering states as in Medvedovic et al. (2002).
-clust1_medv  <- medv(distance1)
-clust2_medv  <- medv(distance2)
-clust3_medv  <- medv(distance3)
+# Clustering states as in Lau and Green (2007)
+clust1_lau  <- laugreen(distance1)$cl
+clust2_lau  <- laugreen(distance2)$cl
+clust3_lau  <- laugreen(distance3)$cl
+
+## Usage choice
+# levels(dataset$state)[-1][clust1_lau==1]
+# levels(dataset$state)[-1][clust1_lau==2]
+# levels(dataset$state)[-1][clust1_lau==3]
+# levels(dataset$state)[-1][clust1_lau==4]
+
+## Reversibility choice
+# levels(dataset$state)[-1][clust2_lau==1]
+# levels(dataset$state)[-1][clust2_lau==2]
+
+## Method choice
+# levels(dataset$state)[-1][clust3_lau==1]
+# levels(dataset$state)[-1][clust3_lau==2]
 ```
 
 The graphical representation of India requires additional external files, which **are not provided** in the GitHub repository, but can be dowloaded for free from the [Global Administrative Areas](http://www.gadm.org/) website. We downloaded the data for India in the `shapefile` format. Refer to the documentation of the [Global Administrative Areas](http://www.gadm.org/) for further information about the data source.
@@ -380,7 +398,7 @@ The graph are obtained as follow, computing the mean of the posterior means. The
 
 ```r
 # Usage choice
-state_effects <- c(0,tapply(colMeans(fit1_dp_ranef_s$beta_RF),clust1_medv,mean)[clust1_medv])
+state_effects <- c(0,apply(fit1_dp_ranef_s$beta_RF,2,median)) 
 id         <- states.shp$NAME_1 %in% levels(dataset$state)
 data.plot  <- data.frame(NAME_1 = states.shp$NAME_1[id], id = states.shp$ID_1[id])
 data.plot <- merge(data.plot,data.frame(NAME_1=levels(dataset$state),Effect=state_effects),by="NAME_1")
@@ -394,7 +412,7 @@ final.plot$k <- "Usage Choice"
 p4 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "darkred",high = "white", breaks=-6:6)
 
 # Reversibility choice
-state_effects <- c(0,tapply(colMeans(fit2_dp_ranef_s$beta_RF),clust2_medv,mean)[clust2_medv])
+state_effects <- c(0,apply(fit2_dp_ranef_s$beta_RF,2,median)) 
 id         <- states.shp$NAME_1 %in% levels(dataset$state)
 data.plot  <- data.frame(NAME_1 = states.shp$NAME_1[id], id = states.shp$ID_1[id])
 data.plot <- merge(data.plot,data.frame(NAME_1=levels(dataset$state),Effect=state_effects),by="NAME_1")
@@ -408,7 +426,7 @@ final.plot$k <- "Reversibility Choice"
 p5 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "darkred",high = "white", breaks=-6:6)
 
 # Method choice 
-state_effects <- c(0,tapply(colMeans(fit3_dp_ranef_s$beta_RF),clust3_medv,mean)[clust3_medv])
+state_effects <- c(0,apply(fit3_dp_ranef_s$beta_RF,2,median))
 id         <- states.shp$NAME_1 %in% levels(dataset$state)
 data.plot  <- data.frame(NAME_1 = states.shp$NAME_1[id], id = states.shp$ID_1[id])
 data.plot <- merge(data.plot,data.frame(NAME_1=levels(dataset$state),Effect=state_effects),by="NAME_1")
@@ -420,6 +438,9 @@ final.plot     <- merge.shp.coef[order(merge.shp.coef$order), ]
 # Final plot
 final.plot$k <- "Method Choice"
 p6 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "darkred",high = "white", breaks=-6:6)
+
+ggsave("img/map.pdf",grid.arrange(p4,p5,p6,ncol=3),device="pdf",width=10,height=4.5)
+ggsave("img/map.jpg",grid.arrange(p4,p5,p6,ncol=3),device="jpg",width=10,height=4.5)
 ```
 
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/map.jpg)
