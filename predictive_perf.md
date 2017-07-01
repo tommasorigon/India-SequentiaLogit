@@ -4,11 +4,9 @@
 
 In this document we describe how to reproduce the predictive performance discussed in Section 4 of our paper.
 
-**Important note for OS X**. If you encounter error compiling the C++ code on a Mac Os X, this could be due to recent updates of the software `R` (version 3.4.0). Please refer to the [official R documentation](https://cloud.r-project.org/bin/macosx/tools/) for more details on this issue.
-
 The first part of this document follows closely the estimation of the full model explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. However, we will estimate all the models and submodels only on a fraction of the data (about the 75%).
 
-The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory without running the following step. 
+The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need some hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory without running the following step. 
 
 ## Model estimation
 
@@ -19,30 +17,37 @@ We do not enters in the detail of the following code chunk, since it is almost a
 library(dplyr)
 library(BayesLogit)
 library(splines)
-library(Rcpp)
-library(RcppArmadillo)
 
 rm(list=ls())
 
 # Load the clean dataset
 load("dataset.RData")
 
-# Compile the C++ functions
-sourceCpp("core_functions.cpp")
-
 # Load the R functions
 source("core_functions.R")
 
 # Prior distribution
-prior = list(P_Fix_const=1e-2, 
+prior1 <- list(P_Fix_const=1e-2, 
              H=32,
-             a_lambda=1e-3, b_lambda=1e-3,
-             a_tau=1e-4, b_tau=1e-4, 
-             a_alpha=.1, b_alpha=.1)
+             a_lambda=1.5, b_lambda=5e-4,
+             a_tau=0.5, b_tau=0.1,
+             tau_mu = 0.2)
+
+prior2 <- list(P_Fix_const=1e-2, 
+             H=32,
+             a_lambda=1.5, b_lambda=5e-4,
+             a_tau=0.1, b_tau=0.1,
+             tau_mu = 0.02)
+
+prior3 <- list(P_Fix_const=1e-2, 
+             H=32,
+             a_lambda=1.5, b_lambda=5e-4,
+             a_tau=0.15, b_tau=0.1,
+             tau_mu = 0.01)
 
 # Iterations and burn_in
-R       <- 20000
-burn_in <- 2000
+R       <- 40
+burn_in <- 20
 
 # Age enters in the predictor linearly
 f   <- as.formula(target ~ age + child + area + religion + education)
@@ -63,12 +68,12 @@ set.seed(123) # We set a seed so that our results are fully reproducible.
 data_training$target     <- factor(data_training$method!="1. No contraceptive method")
 
 # Estimate the submodels
-fit1_ranef         <- fit_logit(f,data_training$state,data_training$age,data_training,method="ranef",prior,R,burn_in)
-fit1_ranef_s       <- fit_logit(f_s,data_training$state,data_training$age,data_training,method="ranef_s",prior,R,burn_in)
-fit1_dp_ranef      <- fit_logit(f,data_training$state,data_training$age,data_training,method="dp_ranef",prior,R,burn_in)
+fit1_ranef         <- fit_logit(f,data_training$state,data_training$age,data_training,method="ranef",prior1,R,burn_in)
+fit1_ranef_s       <- fit_logit(f_s,data_training$state,data_training$age,data_training,method="ranef_s",prior1,R,burn_in)
+fit1_dp_ranef      <- fit_logit(f,data_training$state,data_training$age,data_training,method="dp_ranef",prior1,R,burn_in)
 
 # Estimate the full model
-fit1_dp_ranef_s    <- fit_logit(f_s,data_training$state,data_training$age,data_training,method="dp_ranef_s",prior,R,burn_in)
+fit1_dp_ranef_s    <- fit_logit(f_s,data_training$state,data_training$age,data_training,method="dp_ranef_s",prior1,R,burn_in)
 
 # Reversible choice ----------------------------------------------------
 set.seed(123) # We set a seed so that our results are fully reproducible.
@@ -80,12 +85,12 @@ data_training2            <- data_training[data_training$method != "1. No contra
 data_training2$target     <- factor(data_training2$method != "2. Sterilization") # table(data_training2$target, data_training2$method)
 
 # Estimate the submodels
-fit2_ranef         <- fit_logit(f,data_training2$state,data_training2$age,data_training2,method="ranef",prior,R,burn_in)
-fit2_ranef_s       <- fit_logit(f_s,data_training2$state,data_training2$age,data_training2,method="ranef_s",prior,R,burn_in)
-fit2_dp_ranef      <- fit_logit(f,data_training2$state,data_training2$age,data_training2,method="dp_ranef",prior,R,burn_in)
+fit2_ranef         <- fit_logit(f,data_training2$state,data_training2$age,data_training2,method="ranef",prior2,R,burn_in)
+fit2_ranef_s       <- fit_logit(f_s,data_training2$state,data_training2$age,data_training2,method="ranef_s",prior2,R,burn_in)
+fit2_dp_ranef      <- fit_logit(f,data_training2$state,data_training2$age,data_training2,method="dp_ranef",prior2,R,burn_in)
 
 # Estimate the full model
-fit2_dp_ranef_s    <- fit_logit(f_s,data_training2$state,data_training2$age,data_training2,method="dp_ranef_s",prior,R,burn_in)
+fit2_dp_ranef_s    <- fit_logit(f_s,data_training2$state,data_training2$age,data_training2,method="dp_ranef_s",prior2,R,burn_in)
 
 # Method choice ----------------------------------------------------
 set.seed(123) # We set a seed so that our results are fully reproducible.
@@ -97,59 +102,12 @@ data_training3            <- data_training2[data_training2$method != "2. Sterili
 data_training3$target     <- factor(data_training3$method != "3. Natural methods") # table(data_training3$target,data_training3$method)
 
 # Estimate the submodels
-fit3_ranef         <- fit_logit(f,data_training3$state,data_training3$age,data_training3,method="ranef",prior,R,burn_in)
-fit3_ranef_s       <- fit_logit(f_s,data_training3$state,data_training3$age,data_training3,method="ranef_s",prior,R,burn_in)
-fit3_dp_ranef      <- fit_logit(f,data_training3$state,data_training3$age,data_training3,method="dp_ranef",prior,R,burn_in)
+fit3_ranef         <- fit_logit(f,data_training3$state,data_training3$age,data_training3,method="ranef",prior3,R,burn_in)
+fit3_ranef_s       <- fit_logit(f_s,data_training3$state,data_training3$age,data_training3,method="ranef_s",prior3,R,burn_in)
+fit3_dp_ranef      <- fit_logit(f,data_training3$state,data_training3$age,data_training3,method="dp_ranef",prior3,R,burn_in)
 
 # Estimate the full model
-fit3_dp_ranef_s    <- fit_logit(f_s,data_training3$state,data_training3$age,data_training3,method="dp_ranef_s",prior,R,burn_in)
-
-# Thinning
-thinning <- 5*(1:4000)
-
-# DP
-fit1_dp_ranef$beta_RF     <- fit1_dp_ranef$beta_RF[thinning,]
-fit2_dp_ranef$beta_RF     <- fit2_dp_ranef$beta_RF[thinning,]
-fit3_dp_ranef$beta_RF     <- fit3_dp_ranef$beta_RF[thinning,]
-fit1_dp_ranef$beta_Fix    <- fit1_dp_ranef$beta_Fix[thinning,]
-fit2_dp_ranef$beta_Fix    <- fit2_dp_ranef$beta_Fix[thinning,]
-fit3_dp_ranef$beta_Fix    <- fit3_dp_ranef$beta_Fix[thinning,]
-fit1_dp_ranef$beta_spline <- fit1_dp_ranef$beta_spline[thinning,]
-fit2_dp_ranef$beta_spline <- fit2_dp_ranef$beta_spline[thinning,]
-fit3_dp_ranef$beta_spline <- fit3_dp_ranef$beta_spline[thinning,]
-
-# Gaussian 
-fit1_ranef$beta_RF <- fit1_ranef$beta_RF[thinning,]
-fit2_ranef$beta_RF <- fit2_ranef$beta_RF[thinning,]
-fit3_ranef$beta_RF <- fit3_ranef$beta_RF[thinning,]
-fit1_ranef$beta_Fix <- fit1_ranef$beta_Fix[thinning,]
-fit2_ranef$beta_Fix <- fit2_ranef$beta_Fix[thinning,]
-fit3_ranef$beta_Fix <- fit3_ranef$beta_Fix[thinning,]
-fit1_ranef$beta_spline <- fit1_ranef$beta_spline[thinning,]
-fit2_ranef$beta_spline <- fit2_ranef$beta_spline[thinning,]
-fit3_ranef$beta_spline <- fit3_ranef$beta_spline[thinning,]
-
-# Gaussian + Splines
-fit1_ranef_s$beta_RF <- fit1_ranef_s$beta_RF[thinning,]
-fit2_ranef_s$beta_RF <- fit2_ranef_s$beta_RF[thinning,]
-fit3_ranef_s$beta_RF <- fit3_ranef_s$beta_RF[thinning,]
-fit1_ranef_s$beta_Fix <- fit1_ranef_s$beta_Fix[thinning,]
-fit2_ranef_s$beta_Fix <- fit2_ranef_s$beta_Fix[thinning,]
-fit3_ranef_s$beta_Fix <- fit3_ranef_s$beta_Fix[thinning,]
-fit1_ranef_s$beta_spline <- fit1_ranef_s$beta_spline[thinning,]
-fit2_ranef_s$beta_spline <- fit2_ranef_s$beta_spline[thinning,]
-fit3_ranef_s$beta_spline <- fit3_ranef_s$beta_spline[thinning,]
-
-# DP + splines
-fit1_dp_ranef_s$beta_RF <- fit1_dp_ranef_s$beta_RF[thinning,]
-fit2_dp_ranef_s$beta_RF <- fit2_dp_ranef_s$beta_RF[thinning,]
-fit3_dp_ranef_s$beta_RF <- fit3_dp_ranef_s$beta_RF[thinning,]
-fit1_dp_ranef_s$beta_Fix <- fit1_dp_ranef_s$beta_Fix[thinning,]
-fit2_dp_ranef_s$beta_Fix <- fit2_dp_ranef_s$beta_Fix[thinning,]
-fit3_dp_ranef_s$beta_Fix <- fit3_dp_ranef_s$beta_Fix[thinning,]
-fit1_dp_ranef_s$beta_spline <- fit1_dp_ranef_s$beta_spline[thinning,]
-fit2_dp_ranef_s$beta_spline <- fit2_dp_ranef_s$beta_spline[thinning,]
-fit3_dp_ranef_s$beta_spline <- fit3_dp_ranef_s$beta_spline[thinning,]
+fit3_dp_ranef_s    <- fit_logit(f_s,data_training3$state,data_training3$age,data_training3,method="dp_ranef_s",prior3,R,burn_in)
 
 # Save relevants files
 
@@ -160,9 +118,10 @@ save(fit1_ranef,
      file="workspaces/pred_ranef.RData")
 
 # Splines
-save(fit1_ranef_s,file="workspaces/pred_ranef_s_part1.RData")
-save(fit2_ranef_s,file="workspaces/pred_ranef_s_part2.RData")
-save(fit3_ranef_s,file="workspaces/pred_ranef_s_part3.RData")
+save(fit1_ranef_s,
+     fit2_ranef_s,
+     fit3_ranef_s,
+     file="workspaces/pred_ranef_s.RData")
 
 # DP
 save(fit1_dp_ranef,
@@ -205,9 +164,7 @@ load("dataset.RData")
 
 # Load the results of the MCMC chain
 load("workspaces/pred_ranef.RData")
-load("workspaces/pred_ranef_s_part1.RData")
-load("workspaces/pred_ranef_s_part2.RData")
-load("workspaces/pred_ranef_s_part3.RData")
+load("workspaces/pred_ranef_s.RData")
 load("workspaces/pred_dp_ranef.RData")
 load("workspaces/pred_dp_ranef_s.RData")
 load("workspaces/train_validation.RData")
@@ -296,7 +253,7 @@ We used here the [`ranger`](https://cran.r-project.org/web/packages/ranger/index
 
 
 ```r
-set.seed(123) # Setting the seed for reproducibility
+set.seed(123)
 fit_ranf1 <- ranger(target ~ state + age + child + area + religion + education, 
                     data=data_training,
                     probability=TRUE, 
@@ -358,12 +315,17 @@ knitr::kable(round(t(tab_part1),digits = 3),format="markdown")
 
 |                  | baseline|    DP| Splines| DP + Splines| Random Forest|
 |:-----------------|--------:|-----:|-------:|------------:|-------------:|
-|AUC               |    0.791| 0.791|   0.799|        0.797|         0.799|
-|Misclassification |    0.262| 0.263|   0.254|        0.255|         0.253|
-|FPR               |    0.337| 0.337|   0.333|        0.335|         0.326|
-|FNR               |    0.262| 0.263|   0.254|        0.255|         0.253|
+|AUC               |    0.790| 0.790|   0.799|        0.797|         0.799|
+|Misclassification |    0.261| 0.261|   0.254|        0.254|         0.253|
+|FPR               |    0.335| 0.335|   0.330|        0.333|         0.326|
+|FNR               |    0.261| 0.261|   0.254|        0.254|         0.253|
 
-![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/Roc_curve.jpg)
+```r
+ggsave("img/Roc_curve.pdf",p7,device="pdf",width=11,height=9)
+ggsave("img/Roc_curve.jpg",p7,device="jpg",width=11,height=9)
+```
+
+<!-- ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/Roc_curve.jpg) -->
 
 ## Predictive performance: second step
 
@@ -405,9 +367,9 @@ prob_dp <- data.frame(Sterilization         =  rowMeans(1 - rho2),
                       ModernMethods         =  rowMeans(rho2*rho3))
 ```
 
-#### De Oliveira et al. (2004) model
+#### De Oliveira et al. (2014) model
 
-A multinomial model is estimated in order to reproduce the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). The variable `state`] enters in the multinomial specification a a fixed effect. As explained in the paper, the variable `age` enters in the model via a piecewise constant specification.
+A multinomial model is estimated in order to reproduce the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). The variable `state` enters in the multinomial specification a a fixed effect. As explained in the paper, the variable `age` enters in the model via a piecewise constant specification.
 
 
 ```r
@@ -481,5 +443,5 @@ knitr::kable(round(t(tab_part2),digits = 3),format="markdown")
 
 |                  | baseline| splines|    DP| DP + splines| Random Forest| Multinomial|
 |:-----------------|--------:|-------:|-----:|------------:|-------------:|-----------:|
-|Misclassification |    0.233|   0.229| 0.234|         0.23|         0.237|       0.233|
+|Misclassification |    0.234|   0.229| 0.234|        0.229|         0.237|       0.233|
 
