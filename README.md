@@ -9,13 +9,13 @@ This additional documentation is organized in four sections, which should be exe
 - A [`results.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/results.md) document, in which graph and tables of Section 4 of the paper are reproduced.
 - A [`predictive_pref.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/predictive_perf.md) document, in which out-of-sample performances are computed for our model and for the competing models. 
 
-In the repository we also made available the files [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) and [`core_functions.cpp`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp), which contain the "core" functions for estimating our model.
+In the repository we also made available the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) which contain the "core" functions for estimating our model.
 
 ## Shiny application
 
 We builded a [Shiny application](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/SequentiaLogisticApp) in which we displayed, for a given woman, the posterior probabilities of each contraceptive behaviour, and the sequential propabilities discussed in the paper. The characteristic of the woman (e.g. `age`, `child`, etc.) can be defined interactively by the user.
 
-The application relies on three `R` packages: `shiny`, `shinydashboard` and `ggplot2`, which **should be installed** in the local environment, if not already available. Then, the Shiny application can be launched by executing the following `R` code.
+The application relies on three `R` packages: `shiny`, `shinydashboard` and `ggplot2`, which **have to be installed** in the local environment, if not already available. Then, the Shiny application can be launched by executing the following `R` code.
 
 ```r
 # # Command required to install the necessary packages
