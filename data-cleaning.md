@@ -287,6 +287,6 @@ ggsave("img/frequencies.pdf",p0,device="pdf",width=12,height=4)
 ggsave("img/frequencies.jpg",p0,device="jpg",width=12,height=4)
 ```
 
-<!-- ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/frequencies.jpg) -->
+![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/frequencies.jpg)
 
 
