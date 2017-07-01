@@ -109,7 +109,7 @@ prior3 <- list(P_Fix_const=1e-2,
 ```
 
 
-The estimation process **requires a non-negligible amount of time** to be completed. On a standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory directly, without running the next steps. If the reader is not interested in obtaining by itself these workspaces, he / she  can skip to the [convergence diagnostic](## Convergence diagnostic) step.
+The estimation process **requires a non-negligible amount of time** to be completed. On a standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory directly, without running the next steps. If the reader is not interested in obtaining by itself these workspaces, he / she  can skip to the convergence diagnostic step.
 
 #### 1. Usage choice
 
