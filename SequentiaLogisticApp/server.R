@@ -77,10 +77,10 @@ shinyServer(function(input, output) {
       })
   
   output$marginal <- renderTable({
-    out <- data.frame(rho_1 = mean(1 - prob1()),
-                      rho_2 = mean(prob1()*(1-prob2())),
-                      rho_3 = mean(prob1()*prob2()*(1-prob3())),
-                      rho_4 = mean(prob1()*prob2()*prob3()))
+    out <- data.frame(p1_1 = mean(1 - prob1()),
+                      p2_2 = mean(prob1()*(1-prob2())),
+                      p3_3 = mean(prob1()*prob2()*(1-prob3())),
+                      p4_4 = mean(prob1()*prob2()*prob3()))
     colnames(out) <- c("No contraception","Sterilization","Natural methods","Modern methods")
     out
   })
