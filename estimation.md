@@ -2,29 +2,22 @@
 
 ## Description
 
-In this document we describe how to estimate the model we described in Section 3 of our paper. We implemented our algorithm in R, making use of the `Rcpp` and `RcppArmadillo` R packages for the most computationally intensive steps. The [R code](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) is made available as well as the [C++](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp) code. 
+In this document we describe how to estimate the model we described in Section 3 of our paper. We implemented our algorithm in R: the source [R code](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) is made available. 
 
-**Important note for OS X**. If you encounter error compiling the C++ code on a Mac Os X, this could be due to recent updates of the software `R` (version 3.4.0). Please refer to the [official R documentation](https://cloud.r-project.org/bin/macosx/tools/) for more details on this issue.
+The Gibbs sampler for our model can be called using the function `fit_logit`, which we will use extensively during this document. As a first step, we load in memory all the required libraries  and we load in memory also the previously obtained [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md), which **is not made available** in this repository.
 
-The Gibbs sampler for our model can be called using the function `fit_logit`, which we will use extensively during this document. As a first step, we load in memory all the required libraries and we compile the [C++](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.cpp) code. Moreover, we load in memory also the previously obtained [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md), which **is not made available** in this repository.
-
-The functions `logit_ranef`, `logit_ranef_spline` and `logit_ranefDP` allow to estimate the submodels described in Section 4.1 of the paper. The function `logit_ranefDP_spline` estimates the full model. All these functions are wrapped by the global `fit_logit` function.
+The function `fit_logit` also allows for the estimation of the submodels described in Section 4.1 of the paper. Notice that even in the code the Gaussian random effects are obtained as a particular case, by fixing the number of mixture components `H = 1`.
 
 
 ```r
 library(dplyr)
 library(BayesLogit)
 library(splines)
-library(Rcpp)
-library(RcppArmadillo)
 
 rm(list=ls())
 
 # Load the clean dataset
 load("dataset.RData")
-
-# Compile the C++ functions
-sourceCpp("core_functions.cpp")
 
 # Load the R functions
 source("core_functions.R")
@@ -32,22 +25,11 @@ source("core_functions.R")
 
 ## Prior specification and estimation
 
-The prior hyperparameters for our model and the submodels, discussed in Section 3 and Section 4.1 for the submodels, is specified through a list. Note that fixing `P_Fix_const = 1e-2` is equivalent to set **B** = (100,...,100). The name of the other terms closely recall those of the paper.
+We set the number of MCMC iterations equal to `R=4000` with a burn-in equal to `burn_in=2000`. The algorithm will run for `20000` iterations but the chain is thinned every `5` samples. We also define two `formula`: one for the specification in which `age` enters in the predictor linearly and one in which `age` is modeled using Bayesian penalized splines.
 
 
 ```r
-prior = list(P_Fix_const=1e-2, 
-             H=32,
-             a_lambda=1e-3, b_lambda=1e-3,
-             a_tau=1e-4, b_tau=1e-4, 
-             a_alpha=.1, b_alpha=.1)
-```
-
-We set the number of MCMC iterations equal to `R=20000` with a burn-in equal to `burn_in=2000`. We also define two `formula`: one for the specification in which `age` enters in the predictor linearly and one in which `age` is modeled using Bayesian penalized splines.
-
-
-```r
-R       <- 20000
+R       <- 4000
 burn_in <- 2000
 
 # Age enters in the predictor linearly
@@ -56,7 +38,76 @@ f   <- as.formula(target ~ age + child + area + religion + education)
 f_s <- as.formula(target ~ child + area + religion + education)
 ```
 
-The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory directly, without running the next steps. If the reader is not interested in obtaining by itself these workspaces, he / she  can skip to the [convergence diagnostic](## Convergence diagnostic) step.
+In the following chunk, we estimated classical generalized linear models for the `usage choice`, the `reversibility choice` and the `method choice`. Then, we clustered together the coefficients related to each `state`, treated here as fixed effect, via hieriarchical clustering with complete linkage. The number of cluster selected via graphical inspection of the dendrograms.
+
+Then, we computed the average variance within cluster and the mean of the squared cluster means, for all the models. These quantities will be helpful in specifying hyperparameters.
+
+
+```r
+tab <- matrix(0,2,3)
+
+# Usage choice - 3 clusters are selected
+dataset$target     <- factor(dataset$method!="1. No contraceptive method")
+coef1_glm          <- coef(glm(update(f,.~ state +. ),data=dataset,family="binomial"))[2:33]
+cl       <- hclust(dist(coef1_glm),method = "complete")
+cl_means <- tapply(coef1_glm,cutree(cl,3),mean) 
+tab[1,1] <- 1/mean(cl_means^2)
+tab[2,1] <- 1/mean(tapply(coef1_glm,cutree(cl,3),var))
+
+# Reversibility choice - 4 clusters are selected
+dataset2            <- dataset[dataset$method != "1. No contraceptive method",]
+dataset2$target     <- factor(dataset2$method != "2. Sterilization") 
+coef2_glm           <- coef(glm(update(f,.~ state +. ),data=dataset2,family="binomial"))[2:33]
+cl       <- hclust(dist(coef2_glm),method = "complete")
+cl_means <- tapply(coef2_glm,cutree(cl,4),mean)
+tab[1,2] <- 1/mean(cl_means^2)
+tab[2,2] <- 1/mean(tapply(coef2_glm,cutree(cl,3),var),na.rm=TRUE)
+
+# Method choice - 3 cluster are selected
+dataset3            <- dataset2[dataset2$method != "2. Sterilization",]
+dataset3$target     <- factor(dataset3$method != "3. Natural methods") 
+coef3_glm <- coef(glm(update(f,.~ state +. ),data=dataset3,family="binomial"))[2:33]
+cl       <- hclust(dist(coef3_glm),method = "complete")
+cl_means <- tapply(coef3_glm,cutree(cl,3),mean)
+
+tab[1,3] <- 1/mean(cl_means^2)
+tab[2,3] <- 1/mean(tapply(coef3_glm,cutree(cl,3),var))
+
+colnames(tab) <- c("Usage choice","Reversibility choice","Method choice")
+rownames(tab) <- c("Precision of the cluster means","Precision within the cluster")
+knitr::kable(tab)
+```
+
+                                  Usage choice   Reversibility choice   Method choice
+-------------------------------  -------------  ---------------------  --------------
+Precision of the cluster means       0.2333634              0.0215313       0.0111064
+Precision within the cluster         5.0992340              1.1460989       1.6656611
+
+The prior hyperparameters for our model and the submodels, discussed in Section 3 and Section 4.1 for the submodels, is specified through a list. Note that fixing `P_Fix_const = 1e-2` is equivalent to set **B** = (100,...,100). We derived different prior distribution for the `usage choice` model, the `reversibility choice` and the `method choice` model, basing this decision on the table reported above.
+
+
+```r
+prior1 <- list(P_Fix_const=1e-2, 
+             H=32,
+             a_lambda=1.5, b_lambda=5e-4,
+             a_tau=0.5, b_tau=0.1,
+             tau_mu = 0.2)
+
+prior2 <- list(P_Fix_const=1e-2, 
+             H=32,
+             a_lambda=1.5, b_lambda=5e-4,
+             a_tau=0.1, b_tau=0.1,
+             tau_mu = 0.02)
+
+prior3 <- list(P_Fix_const=1e-2, 
+             H=32,
+             a_lambda=1.5, b_lambda=5e-4,
+             a_tau=0.15, b_tau=0.1,
+             tau_mu = 0.01)
+```
+
+
+The estimation process **requires a non-negligible amount of time** to be completed. On a standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory directly, without running the next steps. If the reader is not interested in obtaining by itself these workspaces, he / she  can skip to the [convergence diagnostic](## Convergence diagnostic) step.
 
 #### 1. Usage choice
 
@@ -70,12 +121,12 @@ set.seed(123) # We set a seed so that our results are fully reproducible.
 dataset$target     <- factor(dataset$method!="1. No contraceptive method")
 
 # Estimate the submodels
-fit1_ranef         <- fit_logit(f,dataset$state,dataset$age,dataset,method="ranef",prior,R,burn_in)
-fit1_ranef_s       <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="ranef_s",prior,R,burn_in)
-fit1_dp_ranef      <- fit_logit(f,dataset$state,dataset$age,dataset,method="dp_ranef",prior,R,burn_in)
+fit1_ranef         <- fit_logit(f,dataset$state,dataset$age,dataset,method="ranef",prior1,R,burn_in)
+fit1_ranef_s       <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="ranef_s",prior1,R,burn_in)
+fit1_dp_ranef      <- fit_logit(f,dataset$state,dataset$age,dataset,method="dp_ranef",prior1,R,burn_in)
 
 # Estimate the full model
-fit1_dp_ranef_s    <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="dp_ranef_s",prior,R,burn_in)
+fit1_dp_ranef_s    <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="dp_ranef_s",prior1,R=R,burn_in=burn_in)
 ```
 
 #### 2. Reversibility choice
@@ -90,15 +141,15 @@ set.seed(123) # We set a seed so that our results are fully reproducible.
 dataset2            <- dataset[dataset$method != "1. No contraceptive method",]
 
 # We define the new target variable. 
-dataset2$target     <- factor(dataset2$method != "2. Sterilization") # table(dataset2$target, dataset2$method)
+dataset2$target     <- factor(dataset2$method != "2. Sterilization") 
 
 # Estimate the submodels
-fit2_ranef         <- fit_logit(f,dataset2$state,dataset2$age,dataset2,method="ranef",prior,R,burn_in)
-fit2_ranef_s       <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method="ranef_s",prior,R,burn_in)
-fit2_dp_ranef      <- fit_logit(f,dataset2$state,dataset2$age,dataset2,method="dp_ranef",prior,R,burn_in)
+fit2_ranef         <- fit_logit(f,dataset2$state,dataset2$age,dataset2,method="ranef",prior2,R,burn_in)
+fit2_ranef_s       <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method="ranef_s",prior2,R,burn_in)
+fit2_dp_ranef      <- fit_logit(f,dataset2$state,dataset2$age,dataset2,method="dp_ranef",prior2,R,burn_in)
 
 # Estimate the full model
-fit2_dp_ranef_s    <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method="dp_ranef_s",prior,R,burn_in)
+fit2_dp_ranef_s    <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method="dp_ranef_s",prior2,R,burn_in)
 ```
 
 
@@ -118,64 +169,18 @@ dataset3            <- dataset2[dataset2$method != "2. Sterilization",]
 dataset3$target     <- factor(dataset3$method != "3. Natural methods") # table(dataset3$target,dataset3$method)
 
 # Estimate the submodels
-fit3_ranef         <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="ranef",prior,R,burn_in)
-fit3_ranef_s       <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="ranef_s",prior,R,burn_in)
-fit3_dp_ranef      <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="dp_ranef",prior,R,burn_in)
+fit3_ranef         <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="ranef",prior3,R,burn_in)
+fit3_ranef_s       <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="ranef_s",prior3,R,burn_in)
+fit3_dp_ranef      <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="dp_ranef",prior3,R,burn_in)
 
 # Estimate the full model
-fit3_dp_ranef_s    <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="dp_ranef_s",prior,R,burn_in)
+fit3_dp_ranef_s    <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="dp_ranef_s",prior3,R,burn_in)
 ```
 
 We end the estimation step by thinning the beta coefficients, cleaning the workspace and finally saving the results in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder.
 
 
 ```r
-thinning <- 5*(1:4000)
-
-# DP
-fit1_dp_ranef$beta_RF     <- fit1_dp_ranef$beta_RF[thinning,]
-fit2_dp_ranef$beta_RF     <- fit2_dp_ranef$beta_RF[thinning,]
-fit3_dp_ranef$beta_RF     <- fit3_dp_ranef$beta_RF[thinning,]
-fit1_dp_ranef$beta_Fix    <- fit1_dp_ranef$beta_Fix[thinning,]
-fit2_dp_ranef$beta_Fix    <- fit2_dp_ranef$beta_Fix[thinning,]
-fit3_dp_ranef$beta_Fix    <- fit3_dp_ranef$beta_Fix[thinning,]
-fit1_dp_ranef$beta_spline <- fit1_dp_ranef$beta_spline[thinning,]
-fit2_dp_ranef$beta_spline <- fit2_dp_ranef$beta_spline[thinning,]
-fit3_dp_ranef$beta_spline <- fit3_dp_ranef$beta_spline[thinning,]
-
-# Gaussian 
-fit1_ranef$beta_RF <- fit1_ranef$beta_RF[thinning,]
-fit2_ranef$beta_RF <- fit2_ranef$beta_RF[thinning,]
-fit3_ranef$beta_RF <- fit3_ranef$beta_RF[thinning,]
-fit1_ranef$beta_Fix <- fit1_ranef$beta_Fix[thinning,]
-fit2_ranef$beta_Fix <- fit2_ranef$beta_Fix[thinning,]
-fit3_ranef$beta_Fix <- fit3_ranef$beta_Fix[thinning,]
-fit1_ranef$beta_spline <- fit1_ranef$beta_spline[thinning,]
-fit2_ranef$beta_spline <- fit2_ranef$beta_spline[thinning,]
-fit3_ranef$beta_spline <- fit3_ranef$beta_spline[thinning,]
-
-# Gaussian + Splines
-fit1_ranef_s$beta_RF <- fit1_ranef_s$beta_RF[thinning,]
-fit2_ranef_s$beta_RF <- fit2_ranef_s$beta_RF[thinning,]
-fit3_ranef_s$beta_RF <- fit3_ranef_s$beta_RF[thinning,]
-fit1_ranef_s$beta_Fix <- fit1_ranef_s$beta_Fix[thinning,]
-fit2_ranef_s$beta_Fix <- fit2_ranef_s$beta_Fix[thinning,]
-fit3_ranef_s$beta_Fix <- fit3_ranef_s$beta_Fix[thinning,]
-fit1_ranef_s$beta_spline <- fit1_ranef_s$beta_spline[thinning,]
-fit2_ranef_s$beta_spline <- fit2_ranef_s$beta_spline[thinning,]
-fit3_ranef_s$beta_spline <- fit3_ranef_s$beta_spline[thinning,]
-
-# DP + splines
-fit1_dp_ranef_s$beta_RF <- fit1_dp_ranef_s$beta_RF[thinning,]
-fit2_dp_ranef_s$beta_RF <- fit2_dp_ranef_s$beta_RF[thinning,]
-fit3_dp_ranef_s$beta_RF <- fit3_dp_ranef_s$beta_RF[thinning,]
-fit1_dp_ranef_s$beta_Fix <- fit1_dp_ranef_s$beta_Fix[thinning,]
-fit2_dp_ranef_s$beta_Fix <- fit2_dp_ranef_s$beta_Fix[thinning,]
-fit3_dp_ranef_s$beta_Fix <- fit3_dp_ranef_s$beta_Fix[thinning,]
-fit1_dp_ranef_s$beta_spline <- fit1_dp_ranef_s$beta_spline[thinning,]
-fit2_dp_ranef_s$beta_spline <- fit2_dp_ranef_s$beta_spline[thinning,]
-fit3_dp_ranef_s$beta_spline <- fit3_dp_ranef_s$beta_spline[thinning,]
-
 # Save relevants files
 
 # Baseline
@@ -185,9 +190,9 @@ save(fit1_ranef,
      file="workspaces/ranef.RData")
 
 # Splines
-save(fit1_ranef_s,file="workspaces/ranef_s_part1.RData")
-save(fit2_ranef_s,file="workspaces/ranef_s_part2.RData")
-save(fit3_ranef_s,file="workspaces/ranef_s_part3.RData")
+save(fit1_ranef_s,
+     fit2_ranef_s,
+     fit3_ranef_s,file="workspaces/ranef_s.RData")
 
 # DP
 save(fit1_dp_ranef,
@@ -215,9 +220,7 @@ load("dataset.RData")
 
 # Load the results of the MCMC chain
 load("workspaces/ranef.RData")
-load("workspaces/ranef_s_part1.RData")
-load("workspaces/ranef_s_part2.RData")
-load("workspaces/ranef_s_part3.RData")
+load("workspaces/ranef_s.RData")
 load("workspaces/dp_ranef.RData")
 load("workspaces/dp_ranef_s.RData")
 ```
@@ -259,9 +262,9 @@ knitr::kable(tab1,format='markdown')
 
 |                     |  25%|  50%|  75%|
 |:--------------------|----:|----:|----:|
-|Usage choice         | 1584| 2305| 3405|
-|Reversibility choice | 1738| 2453| 3621|
-|Method choice        | 2724| 3121| 3781|
+|Usage choice         | 1887| 2363| 3074|
+|Reversibility choice | 1629| 1992| 3075|
+|Method choice        | 1244| 2822| 3401|
 
 ```r
 # Effective sample size of SPLINES COEFFICIENTS
@@ -277,9 +280,9 @@ knitr::kable(tab2,format='markdown')
 
 |                     |  25%|  50%|  75%|
 |:--------------------|----:|----:|----:|
-|Usage choice         | 1138| 1261| 1431|
-|Reversibility choice | 1111| 1252| 1846|
-|Method choice        | 1733| 1838| 2135|
+|Usage choice         | 1122| 1242| 1532|
+|Reversibility choice | 1088| 1152| 1710|
+|Method choice        | 1460| 1549| 1938|
 
 ```r
 # Effective sample size of FIXED EFFECTS
@@ -295,7 +298,7 @@ knitr::kable(tab3,format='markdown')
 
 |                     |  25%|  50%|  75%|
 |:--------------------|----:|----:|----:|
-|Usage choice         | 3342| 3413| 3617|
-|Reversibility choice | 2898| 3263| 3687|
-|Method choice        | 2983| 3217| 3414|
+|Usage choice         | 3327| 3435| 3639|
+|Reversibility choice | 3158| 3564| 3630|
+|Method choice        | 3007| 3532| 3728|
 
