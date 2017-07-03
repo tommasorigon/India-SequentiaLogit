@@ -43,123 +43,32 @@ and similarly
 
 > WAIC = WAIC_Usage + WAIC_Reversibility + WAIC_Method
 
+In this document, we report also the **effective degrees of freedom** for each model, according to both the DIC and the WAIC.
 The construction of the table of section 4 is as follows:
 
 
 ```r
-# Construction of the table. The part "c(1,2)" select the rows for the DIC and the WAIC.
-tab <- cbind(c(IC(fit1_ranef)[c(1,2)],
-        IC(fit1_ranef_s)[c(1,2)],
-        IC(fit1_dp_ranef)[c(1,2)],
-        IC(fit1_dp_ranef_s)[c(1,2)]),
-      c(IC(fit2_ranef)[c(1,2)],
-        IC(fit2_ranef_s)[c(1,2)],
-        IC(fit2_dp_ranef)[c(1,2)],
-        IC(fit2_dp_ranef_s)[c(1,2)]),
-      c(IC(fit3_ranef)[c(1,2)],
-        IC(fit3_ranef_s)[c(1,2)],
-        IC(fit3_dp_ranef)[c(1,2)],
-        IC(fit3_dp_ranef_s)[c(1,2)]))
+tab <- rbind(IC(fit1_ranef) + IC(fit2_ranef) + IC(fit3_ranef),
+IC(fit1_ranef_s) + IC(fit2_ranef_s) + IC(fit3_ranef_s),
+IC(fit1_dp_ranef) + IC(fit2_dp_ranef) + IC(fit3_dp_ranef),
+IC(fit1_dp_ranef_s) + IC(fit2_dp_ranef_s) + IC(fit3_dp_ranef_s))
 
-tab <- rbind(tab[2*(1:4)-1,],-2*tab[2*(1:4),]) # Rearrange for graphical reason
-tab <- data.frame(rep(c("baseline","splines","DP", "DP + splines"),2),
-                  round(tab,digits=2), round(rowSums(tab),digits=2))
-```
+tab[,2] <- -2*tab[,2]
 
-The DIC index is finally printed below:
-
-
-```r
-colnames(tab) <- c("DIC","Usage choice","Reversibility choice","Method choice","Total")
-knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
+rownames(tab) <- c("baseline","splines","DP", "DP + splines")
+colnames(tab) <- c("DIC","WAIC","# of parameters","DIC - Effective # of p","WAIC - Effective # of p")
+knitr::kable(round(tab,digits=2),format="markdown")
 ```
 
 
 
-|DIC          | Usage choice| Reversibility choice| Method choice|    Total|
-|:------------|------------:|--------------------:|-------------:|--------:|
-|baseline     |     27566.32|             18236.22|       7705.81| 53508.34|
-|splines      |     27271.78|             18168.30|       7653.94| 53094.02|
-|DP           |     27560.77|             18237.09|       7706.53| 53504.39|
-|DP + splines |     27266.00|             18169.71|       7655.00| 53090.72|
+|             |      DIC|     WAIC| # of parameters| DIC - Effective # of p| WAIC - Effective # of p|
+|:------------|--------:|--------:|---------------:|----------------------:|-----------------------:|
+|baseline     | 53508.34| 53504.01|             129|                 119.70|                  115.37|
+|splines      | 53094.02| 53089.72|             249|                 131.98|                  127.69|
+|DP           | 53504.39| 53497.43|             129|                 121.18|                  114.22|
+|DP + splines | 53090.72| 53083.60|             249|                 133.72|                  126.59|
 
-Similarly, the WAIC index can be printed with the following command:
-
-
-```r
-colnames(tab) <- c("WAIC","Usage choice","Reversibility choice","Method choice","Total")
-knitr::kable(tab[5:8,],format="markdown",row.names = FALSE)
-```
-
-
-
-|WAIC         | Usage choice| Reversibility choice| Method choice|    Total|
-|:------------|------------:|--------------------:|-------------:|--------:|
-|baseline     |     27566.34|             18233.97|       7703.70| 53504.01|
-|splines      |     27271.86|             18166.05|       7651.82| 53089.72|
-|DP           |     27561.54|             18234.49|       7701.41| 53497.43|
-|DP + splines |     27266.83|             18166.44|       7650.32| 53083.60|
-
-#### Effective degrees of freedom 
-
-In this document, we report also the **effective degrees of freedom** for each model, according to both the DIC and the WAIC.
-
-
-```r
-# Construction of the table. The part "c(4,5)" select the row of the p_DIC and the p_WAIC.
-tab <- cbind(c(IC(fit1_ranef)[c(4,5)],
-        IC(fit1_ranef_s)[c(4,5)],
-        IC(fit1_dp_ranef)[c(4,5)],
-        IC(fit1_dp_ranef_s)[c(4,5)]),
-      c(IC(fit2_ranef)[c(4,5)],
-        IC(fit2_ranef_s)[c(4,5)],
-        IC(fit2_dp_ranef)[c(4,5)],
-        IC(fit2_dp_ranef_s)[c(4,5)]),
-      c(IC(fit3_ranef)[c(4,5)],
-        IC(fit3_ranef_s)[c(4,5)],
-        IC(fit3_dp_ranef)[c(4,5)],
-        IC(fit3_dp_ranef_s)[c(4,5)]))
-
-tab <- rbind(tab[2*(1:4)-1,],tab[2*(1:4),]) # Rearrange for graphical reason.
-tab <- data.frame(rep(c("baseline","splines","DP", "DP + splines"),2),
-                  round(tab,digits=2),round(rowSums(tab),digits=2))
-```
-
-For the DIC we have
-
-
-```r
-colnames(tab) <- c("Effective degree of freedom - DIC","Usage choice",
-                   "Reversibility choice","Method choice","Total")
-knitr::kable(tab[1:4,],format="markdown",row.names = FALSE)
-```
-
-
-
-|Effective degree of freedom - DIC | Usage choice| Reversibility choice| Method choice|  Total|
-|:---------------------------------|------------:|--------------------:|-------------:|------:|
-|baseline                          |        42.39|                40.26|         37.05| 119.70|
-|splines                           |        47.80|                44.22|         39.97| 131.98|
-|DP                                |        40.21|                40.85|         40.11| 121.18|
-|DP + splines                      |        45.55|                45.40|         42.76| 133.72|
-
-Similarly, for the WAIC
-
-
-```r
-colnames(tab) <- c("Effective degree of freedom - WAIC","Usage choice",
-                   "Reversibility choice","Method choice","Total")
-knitr::kable(tab[5:8,],format="markdown",row.names = FALSE)
-```
-
-
-
-|Effective degree of freedom - WAIC | Usage choice| Reversibility choice| Method choice|  Total|
-|:----------------------------------|------------:|--------------------:|-------------:|------:|
-|baseline                           |        42.41|                38.02|         34.94| 115.37|
-|splines                            |        47.88|                41.97|         37.84| 127.69|
-|DP                                 |        40.98|                38.25|         34.99| 114.22|
-|DP + splines                       |        46.38|                42.13|         38.08| 126.59|
 
 ## Fixed effects table
 
@@ -296,9 +205,9 @@ ggsave("img/State.jpg",grid.arrange(p1,p2,p3,ncol=1),device="jpg",width=13,heigh
 
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/State.jpg)
 
-## Random effects: India map
+## Random effects: clustering and maps
 
-Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `laugreen` function allows to reproduce the work of [Lau and Green (2007)](https://www.jstor.org/stable/27594259).
+Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `laugreen` function allows to reproduce the work of [Medvedovic et al. (2004)](https://pdfs.semanticscholar.org/d50c/9701d0aa5136d28f992f9464d58c5b7552fb.pdf).
 
 The following chunk of code allows to obtained the cluster labels for the `Usage choice`, `Reversibility choice` and the `Method choice` models. The output of the clustering procedure is omitted, but the is reported below as well 
 
@@ -311,17 +220,36 @@ distance1 <- comp.psm(fit1_dp_ranef_s$S)
 distance2 <- comp.psm(fit2_dp_ranef_s$S)
 distance3 <- comp.psm(fit3_dp_ranef_s$S)
 
-# Clustering states as in Lau and Green (2007)
-clust1_lau  <- laugreen(distance1)$cl
-clust2_lau  <- laugreen(distance2)$cl
-clust3_lau  <- laugreen(distance3)$cl
+# Clustering states as in Medvedovic et al. (2004)
+clust1_med  <- medv(distance1)
+clust2_med  <- medv(distance2)
+clust3_med  <- medv(distance3)
 
 ## Usage choice
-# levels(dataset$state)[-1][clust1_lau==1]
-# levels(dataset$state)[-1][clust1_lau==2]
-# levels(dataset$state)[-1][clust1_lau==3]
-# levels(dataset$state)[-1][clust1_lau==4]
+levels(dataset$state)[-1][clust1_med==1]
+```
 
+```
+##  [1] "Andhra Pradesh"     "Arunachal Pradesh"  "Bihar"             
+##  [4] "Chandigarh"         "Chhattisgarh"       "Dadra+Nagar Haveli"
+##  [7] "Daman & Diu"        "NCT of Delhi"       "Goa"               
+## [10] "Gujarat"            "Haryana"            "Himachal Pradesh"  
+## [13] "Jammu & Kashmir"    "Jharkhand"          "Karnataka"         
+## [16] "Kerala"             "Madhya Pradesh"     "Maharashtra"       
+## [19] "Orissa"             "Pondicherry"        "Punjab"            
+## [22] "Rajasthan"          "Sikkim"             "Tamil Nadu"        
+## [25] "Tripura"            "Uttarakhand"        "West Bengal"
+```
+
+```r
+levels(dataset$state)[-1][clust1_med==2]
+```
+
+```
+## [1] "Assam"     "Manipur"   "Meghalaya" "Mizoram"   "Nagaland"
+```
+
+```r
 ## Reversibility choice
 # levels(dataset$state)[-1][clust2_lau==1]
 # levels(dataset$state)[-1][clust2_lau==2]
@@ -439,8 +367,9 @@ final.plot     <- merge.shp.coef[order(merge.shp.coef$order), ]
 final.plot$k <- "Method Choice"
 p6 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "darkred",high = "white", breaks=-6:6)
 
-ggsave("img/map.pdf",grid.arrange(p4,p5,p6,ncol=3),device="pdf",width=10,height=4.5)
-ggsave("img/map.jpg",grid.arrange(p4,p5,p6,ncol=3),device="jpg",width=10,height=4.5)
+# Commented since it could be very slow!
+# ggsave("img/map.pdf",grid.arrange(p4,p5,p6,ncol=3),device="pdf",width=10,height=4.5)
+# ggsave("img/map.jpg",grid.arrange(p4,p5,p6,ncol=3),device="jpg",width=10,height=4.5)
 ```
 
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/map.jpg)
