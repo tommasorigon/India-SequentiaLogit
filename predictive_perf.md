@@ -239,7 +239,7 @@ xgb_training <- model.matrix(target ~ state + age + child + area + religion + ed
 xgb_training <- xgb.DMatrix(xgb_training, label = as.numeric(data_training$target)-1)
 
 # List of tuning parameters
-nround <- 75
+nround   <- 75
 param    <- list(max_depth=3, eta=0.5, objective='binary:logistic')
 fit1_xgb <- xgboost(data=xgb_training, nrounds = nround, params=param,verbose=0)
 
@@ -371,7 +371,7 @@ xgb_training <- model.matrix(method ~ state + age + child + area + religion + ed
 xgb_training <- xgb.DMatrix(xgb_training, label = as.numeric(data_training2$method)-1)
 
 # List of tuning parameters
-nround <- 50
+nround   <- 50
 param    <- list(max_depth=3, eta=1,num_class=3,objective='multi:softprob')
 fit2_xgb <- xgboost(data=xgb_training, nrounds = nround, params=param,verbose=0)
 
@@ -397,14 +397,14 @@ part2_misclass <- c(missclassM(prob_dp_s,data_validation2$method),
                     )
 
 tab_part2 <- cbind(Misclassification=part2_misclass)
-rownames(tab_part2)<- c("DP + splines","LDA","Random Forest","Gradient Boosting","Multinomial")
+rownames(tab_part2)<- c("DP + splines","LDA","Random Forest","Gradient Boosting","Multinomial (De Oliveira et al.)")
 
 knitr::kable(round(t(tab_part2),digits = 3),format="markdown")
 ```
 
 
 
-|                  | DP + splines|   LDA| Random Forest| Gradient Boosting| Multinomial|
-|:-----------------|------------:|-----:|-------------:|-----------------:|-----------:|
-|Misclassification |        0.229| 0.249|         0.237|             0.231|       0.233|
+|                  | DP + splines|   LDA| Random Forest| Gradient Boosting| Multinomial (De Oliveira et al.)|
+|:-----------------|------------:|-----:|-------------:|-----------------:|--------------------------------:|
+|Misclassification |        0.229| 0.249|         0.237|             0.231|                            0.233|
 
