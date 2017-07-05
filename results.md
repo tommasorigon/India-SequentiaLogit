@@ -207,7 +207,7 @@ ggsave("img/State.jpg",grid.arrange(p1,p2,p3,ncol=1),device="jpg",width=13,heigh
 
 ## Random effects: clustering and maps
 
-Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `medv` function allows to reproduce the work of [Medvedovic et al. (2004)](https://pdfs.semanticscholar.org/d50c/9701d0aa5136d28f992f9464d58c5b7552fb.pdf).
+Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `medv` function allows to reproduce the work of [Medvedovic et al. (2002)](https://www.cs.princeton.edu/~bee/courses/read/medvedovic-bioinformatics-2002.pdf).
 
 The following chunk of code allows to obtained the cluster labels for the `Usage choice`, `Reversibility choice` and the `Method choice` models. The output of the clustering procedure is omitted, but the is reported below as well 
 
