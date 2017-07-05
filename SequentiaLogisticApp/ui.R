@@ -17,7 +17,7 @@ body <- dashboardBody(
                plotOutput("ReversibleChoice")
            ),
            box(width = NULL,
-               h4("Method Choice"),p("In the graph below is represented the posterior density of the conditional probability of using a traditional (natural) method, provided that a reversible contraceptive method was used."),
+               h4("Method Choice"),p("In the graph below is represented the posterior density of the conditional probability of using a modern method, provided that a reversible contraceptive method was used."),
                plotOutput("MethodChoice")
            )
     ),
