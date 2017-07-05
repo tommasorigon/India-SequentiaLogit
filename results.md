@@ -183,21 +183,21 @@ data.plot <- melt(as.matrix(fit1_dp_ranef_s$beta_RF))
 data.plot$k <- "Usage choice"
 # Ordering the levels according to the median
 data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit1_dp_ranef_s$beta_RF,2, median))])
-p1 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) 
+p1 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.alpha = 0) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) +ylim(c(-5,2.5))
 
 # Reversibility choice
 data.plot <- melt(as.matrix(fit2_dp_ranef_s$beta_RF))
 data.plot$k <- "Reversibility choice"
 # Ordering the levels according to the median
 data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit2_dp_ranef_s$beta_RF,2, median))])
-p2 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) + ylim(c(-10,10))
+p2 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.alpha = 0) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) + ylim(c(-10,2.5))
 
 # Method choice
 data.plot <- melt(as.matrix(fit3_dp_ranef_s$beta_RF))
 data.plot$k <- "Method choice"
 # Ordering the levels according to the median
 data.plot$Var2    <- factor(data.plot$Var2, levels = levels(data.plot$Var2)[order(apply(fit3_dp_ranef_s$beta_RF,2, median))])
-p3 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.size = 0.6) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) +ylim(-3,15)
+p3 <- ggplot(data = data.plot, aes(x = Var2, y = value)) + geom_boxplot(outlier.alpha = 0) + theme_bw() + theme(axis.text.x = element_text(angle = 50,hjust = 1)) + theme(legend.position = "none")+ xlab("") + ylab("State effect") + facet_grid(~k) +ylim(-2,10)
 
 ggsave("img/State.pdf",grid.arrange(p1,p2,p3,ncol=1),device="pdf",width=13,height=15)
 ggsave("img/State.jpg",grid.arrange(p1,p2,p3,ncol=1),device="jpg",width=13,height=15)
@@ -207,7 +207,7 @@ ggsave("img/State.jpg",grid.arrange(p1,p2,p3,ncol=1),device="jpg",width=13,heigh
 
 ## Random effects: clustering and maps
 
-Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `laugreen` function allows to reproduce the work of [Medvedovic et al. (2004)](https://pdfs.semanticscholar.org/d50c/9701d0aa5136d28f992f9464d58c5b7552fb.pdf).
+Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `medv` function allows to reproduce the work of [Medvedovic et al. (2004)](https://pdfs.semanticscholar.org/d50c/9701d0aa5136d28f992f9464d58c5b7552fb.pdf).
 
 The following chunk of code allows to obtained the cluster labels for the `Usage choice`, `Reversibility choice` and the `Method choice` models. The output of the clustering procedure is omitted, but the is reported below as well 
 
