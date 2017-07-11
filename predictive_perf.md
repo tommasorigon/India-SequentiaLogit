@@ -329,6 +329,7 @@ As before, the random forest is  obtained using the `ranger` R package.
 set.seed(123)
 fit_ranf2 <- ranger(method ~ state + age + child + area + religion + education, 
                     data=data_training2,
+                    mtry = 3,
                     probability=TRUE, 
                     num.trees = 1000)
 prob_ranger <- predict(fit_ranf2,data=data_validation2,type="response")$prediction
@@ -382,5 +383,5 @@ knitr::kable(round(t(tab_part2),digits = 3),format="markdown")
 
 |                  | DP + splines|   LDA| Random Forest| Gradient Boosting| Multinomial (De Oliveira et al.)|
 |:-----------------|------------:|-----:|-------------:|-----------------:|--------------------------------:|
-|Misclassification |        0.229| 0.249|         0.237|             0.231|                            0.233|
+|Misclassification |        0.229| 0.249|         0.234|             0.231|                            0.233|
 
