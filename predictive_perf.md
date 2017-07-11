@@ -141,18 +141,6 @@ missclassM<- function(pred,target){
   1 - sum(diag(t))/sum(t)
 }
 
-# False positive rate
-fpr <- function(pred,target,cutoff=0.5){
-  t <- table(pred > cutoff,target)
-  t[2,1]/sum(t[,1])
-}
-
-# False negative rate
-fnr <- function(pred,target,cutoff=0.5){
-  t <- table(pred > cutoff,target)
-  t[1,2]/sum(t[,2])
-}
-
 # Area under the ROC curve (using the ROCR package)
 AUC <- function(pred,target){
   auc <- performance(prediction(pred,target), measure = "auc")  
@@ -255,14 +243,14 @@ rho1_xgb <- predict(fit1_xgb,newdata=xgb_validation)
 
 #### ROC curve and performances
 
-For each model, we computed the AUC, the misclassification rate, the false positive and negative rates. The ROC curves for each model are computed and the performance indexes are reported in the table below. For the misclassification, we used a `cutoff=0.75` in order to obtain a balance between false positive and false negative. 
+For each model, we computed the AUC and the misclassification rate. For the misclassification, we used a `cutoff=0.5`.
 
 
 ```r
 target_val  <- as.numeric(data_validation$method != "1. No contraceptive method")
 n_val       <- length(target_val)
 
-cutoff    <- 0.75
+cutoff    <- 0.5
 part1_AUC <- c(AUC(rho1_dp_s,target_val),
                AUC(rho1_lda,target_val),
                AUC(rho1_ranger,target_val),
@@ -271,19 +259,9 @@ part1_misclass <- c(missclass(rho1_dp_s,target_val,cutoff),
                     missclass(rho1_lda,target_val,cutoff),
                     missclass(rho1_ranger,target_val,cutoff),
                     missclass(rho1_xgb,target_val,cutoff))
-part1_fpr <- c(fpr(rho1_dp_s,target_val,cutoff),
-               fpr(rho1_lda,target_val,cutoff),
-               fpr(rho1_ranger,target_val,cutoff),
-               fpr(rho1_xgb,target_val,cutoff))
-part1_fnr <- c(fnr(rho1_dp_s,target_val,cutoff),
-               fnr(rho1_lda,target_val,cutoff),
-               fnr(rho1_ranger,target_val,cutoff),
-               fnr(rho1_xgb,target_val,cutoff))
 # Output
 tab_part1 <- cbind(AUC=part1_AUC,
-                   Misclassification=part1_misclass,
-                   FPR=part1_fpr,
-                   FNR=part1_misclass)
+                   Misclassification=part1_misclass)
 rownames(tab_part1)<- c("DP + Splines","LDA","Random Forest","Gradient Boosting")
 knitr::kable(round(t(tab_part1),digits = 3),format="markdown")
 ```
@@ -293,9 +271,7 @@ knitr::kable(round(t(tab_part1),digits = 3),format="markdown")
 |                  | DP + Splines|   LDA| Random Forest| Gradient Boosting|
 |:-----------------|------------:|-----:|-------------:|-----------------:|
 |AUC               |        0.799| 0.790|         0.797|             0.803|
-|Misclassification |        0.254| 0.230|         0.253|             0.247|
-|FPR               |        0.334| 0.403|         0.326|             0.335|
-|FNR               |        0.254| 0.230|         0.253|             0.247|
+|Misclassification |        0.197| 0.196|         0.196|             0.194|
 ## Predictive performance: second step
 
 For the second step, we evaluated the remaining models jointly, so that we can make a fair comparison with the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). Women not using a contraceptive methods were excluded also from the validation set.
