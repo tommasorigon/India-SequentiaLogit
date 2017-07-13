@@ -43,7 +43,6 @@ and similarly
 
 > WAIC = WAIC_Usage + WAIC_Reversibility + WAIC_Method
 
-In this document, we report also the **effective degrees of freedom** for each model, according to both the DIC and the WAIC.
 The construction of the table of section 4 is as follows:
 
 
@@ -54,20 +53,21 @@ IC(fit1_dp_ranef) + IC(fit2_dp_ranef) + IC(fit3_dp_ranef),
 IC(fit1_dp_ranef_s) + IC(fit2_dp_ranef_s) + IC(fit3_dp_ranef_s))
 
 tab[,2] <- -2*tab[,2]
+tab <- tab[,c(1,2)]
 
 rownames(tab) <- c("baseline","splines","DP", "DP + splines")
-colnames(tab) <- c("DIC","WAIC","# of parameters","DIC - Effective # of p","WAIC - Effective # of p")
+colnames(tab) <- c("DIC","WAIC")
 knitr::kable(round(tab,digits=2),format="markdown")
 ```
 
 
 
-|             |      DIC|     WAIC| # of parameters| DIC - Effective # of p| WAIC - Effective # of p|
-|:------------|--------:|--------:|---------------:|----------------------:|-----------------------:|
-|baseline     | 53508.34| 53504.01|             129|                 119.70|                  115.37|
-|splines      | 53094.02| 53089.72|             249|                 131.98|                  127.69|
-|DP           | 53504.39| 53497.43|             129|                 121.18|                  114.22|
-|DP + splines | 53090.72| 53083.60|             249|                 133.72|                  126.59|
+|             |      DIC|     WAIC|
+|:------------|--------:|--------:|
+|baseline     | 53508.34| 53504.01|
+|splines      | 53094.02| 53089.72|
+|DP           | 53504.39| 53497.43|
+|DP + splines | 53090.72| 53083.60|
 
 
 ## Fixed effects table
