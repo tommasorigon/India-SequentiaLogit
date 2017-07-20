@@ -283,8 +283,8 @@ colnames(data.plot) <- levels(dataset$method)
 data.plot <- cbind(Age=15:49,melt(data.plot))
 p0 <- ggplot(data = data.plot, aes(x = Age, y = value)) + geom_point() + ylab("") + xlab("") + theme_bw() + facet_grid(~variable)
 
-ggsave("img/frequencies.pdf",p0,device="pdf",width=12,height=4)
-ggsave("img/frequencies.jpg",p0,device="jpg",width=12,height=4)
+ggsave("img/frequencies.pdf",p0,device="pdf",width=8,height=2.666)
+ggsave("img/frequencies.jpg",p0,device="jpg",width=8,height=2.666)
 ```
 
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/frequencies.jpg)
