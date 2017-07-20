@@ -60,10 +60,10 @@ logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, ve
   # Gibbs sampling
   for (r in 1:(R*thinning + burn_in)) {
     
-    # Step 1: Updating omega
+    # Updating omega
     omega       <- rpg.devroye(num = n, n = 1, z = eta)
     
-    # Step 3: Updating the fixed effects (beta_Fix coefficients)
+    # Updating the fixed effects (beta_Fix coefficients)
     eig       <- eigen(crossprod(X_Fix * sqrt(omega)) + P_Fix, symmetric = TRUE)
     Sigma_Fix <- crossprod(t(eig$vectors)/sqrt(eig$values))
     mu_Fix    <- Sigma_Fix %*% (crossprod(X_Fix, y - 0.5 - omega*eta_RF))
@@ -71,7 +71,7 @@ logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, ve
     beta_Fix  <- mu_Fix + c(matrix(rnorm(1 * p_Fix), 1, p_Fix) %*% A1)
     eta_Fix   <- X_Fix %*% beta_Fix
     
-    # Step 5: Updating the random effects (beta_RF coefficients)
+    # Updating the random effects (beta_RF coefficients)
     reg       <- tapply(y - 0.5 - omega*eta_Fix, strata, sum) + theta_RF[S]*tau
     Sigma_RF  <- 1/(tapply(omega, strata, sum) + tau)
     mu_RF     <- Sigma_RF * reg
@@ -81,10 +81,10 @@ logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, ve
     # Linear predictor
     eta <- as.numeric(eta_RF + eta_Fix)
     
-    # Step 6: Updating the mixture variance
+    # Updating the mixture variance
     tau <- rgamma(1, a_tau + p_RF/2, b_tau + sum((beta_RF - theta_RF[S])^2)/2)
     
-    # Step 7: Updating the mixture mean
+    # Updating the mixture mean
     n_S             <- as.numeric(table(S)) # Observations for each cluster
     reg             <- tapply(beta_RF*tau, S, sum)
     reg[is.na(reg)] <- 0 # If in some cluster there are no observation set the mean to 0.
@@ -92,10 +92,10 @@ logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, ve
     mu_theta_RF     <- Sigma_theta_RF * reg
     theta_RF        <- rnorm(H, mu_theta_RF, sqrt(Sigma_theta_RF))
     
-    # Step 4: Updating the mixture weights
+    # Updating the mixture weights
     nu  <- c(rdir(1, 1/H + n_S)) # If H=1 it returns nu = 1.
     
-    # Step 8: Updating the cluster indicator
+    # Updating the cluster indicator
     if(H > 1){
       lprobs <- t(sapply(beta_RF, function(x) log(nu) + dnorm(x,theta_RF,sqrt(1/tau),log=TRUE)))
       probs  <- exp(t(apply(lprobs,1, function(x) x - max(x)))) # Numerical stability!
@@ -216,10 +216,10 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
   # Gibbs sampling
   for (r in 1:(R*thinning + burn_in)) {
     
-    # Step 1: Updating omega
+    # Updating omega
     omega       <- rpg.devroye(num = n, n = 1, z = eta)
     
-    # Step 2: Updating gamma (the beta_splines coefficient)
+    # Updating gamma (the beta_splines coefficient)
     eig          <- eigen(crossprod(B * sqrt(omega)) + lambda*DtD, symmetric = TRUE)
     Sigma_spline <- crossprod(t(eig$vectors)/sqrt(eig$values))
     mu_spline    <- Sigma_spline %*% (crossprod(B, y - 0.5- omega*(eta_RF + eta_Fix)))
@@ -227,13 +227,13 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
     beta_spline  <- mu_spline + c(matrix(rnorm(1 * p_spline), 1, p_spline) %*% A1)
     eta_spline   <- as.numeric(B%*%beta_spline) 
     
-    # Step 9: Updating the smoothing parameter lambda
+    # Updating the smoothing parameter lambda
     mahalanob       <- as.numeric(crossprod(D%*%beta_spline)) 
     a_lambda_tilde  <- a_lambda + rankD/2
     b_lambda_tilde  <- b_lambda + mahalanob/2
     lambda          <- rgamma(1, a_lambda_tilde, b_lambda_tilde)
     
-    # Step 3: Updating the fixed effects (beta_Fix coefficients)
+    # Updating the fixed effects (beta_Fix coefficients)
     eig       <- eigen(crossprod(X_Fix * sqrt(omega)) + P_Fix, symmetric = TRUE)
     Sigma_Fix <- crossprod(t(eig$vectors)/sqrt(eig$values))
     mu_Fix    <- Sigma_Fix %*% (crossprod(X_Fix, y - 0.5 - omega*(eta_RF + eta_spline)))
@@ -241,7 +241,7 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
     beta_Fix  <- mu_Fix + c(matrix(rnorm(1 * p_Fix), 1, p_Fix) %*% A1)
     eta_Fix   <- X_Fix %*% beta_Fix
     
-    # Step 5: Updating the random effects (beta_RF coefficients)
+    # Updating the random effects (beta_RF coefficients)
     reg       <- tapply(y - 0.5 - omega*(eta_Fix + eta_spline), strata, sum)[-1] + theta_RF[S]*tau
     Sigma_RF  <- 1/(tapply(omega, strata, sum) + tau)[-1]
     mu_RF     <- Sigma_RF * reg
@@ -251,10 +251,10 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
     # Linear predictor
     eta <- as.numeric(eta_RF + eta_Fix + eta_spline)
     
-    # Step 6: Updating the mixture variance
+    # Updating the mixture variance
     tau <- rgamma(1, a_tau + p_RF/2, b_tau + sum((beta_RF - theta_RF[S])^2)/2)
     
-    # Step 7: Updating the mixture mean
+    # Updating the mixture mean
     n_S             <- as.numeric(table(S)) # Observations for each cluster
     reg             <- tapply(beta_RF*tau, S, sum)
     reg[is.na(reg)] <- 0 # If in some cluster there are no observation set the mean to 0.
@@ -262,10 +262,10 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
     mu_theta_RF     <- Sigma_theta_RF * reg
     theta_RF        <- rnorm(H, mu_theta_RF, sqrt(Sigma_theta_RF))
     
-    # Step 4: Updating the mixture weights
+    # Updating the mixture weights
     nu  <- c(rdir(1, 1/H + n_S)) # If H=1 it returns nu = 1.
     
-    # Step 8: Updating the cluster indicator
+    # Updating the cluster indicator
     if(H > 1){
       lprobs <- t(sapply(beta_RF, function(x) log(nu) + dnorm(x,theta_RF,sqrt(1/tau),log=TRUE)))
       probs  <- exp(t(apply(lprobs,1, function(x) x - max(x)))) # Numerical stability!
