@@ -161,8 +161,8 @@ data.plot <- rbind(data.plot,data.frame(x=15:49,y=apply(eta3_spline,2,mean),
 
 p.spline <- ggplot(data = data.plot, aes(x = x, y = y,ymin=ymin,ymax=ymax)) + geom_line()  +theme_bw()+ xlab("") + ylab("") + geom_ribbon(alpha=0.25) + facet_grid(.~k)
 
-ggsave("img/Age_effect.pdf",p.spline,device="pdf",width=12,height=4)
-ggsave("img/Age_effect.jpg",p.spline,device="jpg",width=12,height=4)
+ggsave("img/Age_effect.pdf",p.spline,device="pdf",width=8,height=2.6666)
+ggsave("img/Age_effect.jpg",p.spline,device="jpg",width=8,height=2.6666)
 ```
 
 
