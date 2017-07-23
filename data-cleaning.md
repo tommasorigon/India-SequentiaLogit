@@ -93,7 +93,7 @@ table(dataset$pregnant, dataset$contraceptive, useNA="always")
 ##   <NA>            28         5  1718
 ```
 
-We decided to exclude from the analysis pregnant women (`1700`) and those women who do not declared their pregnancy status (`1718 + 28 + 5`), comprising a total of `1700 + 1718 + 28 + 5 = 4185` cases. The `28 + 5 = 33` missing cases, reported in the table above, are women who declared to be `unsure` about their pregnancy status; we holded them out from the dataset as well.
+We decided to exclude from the analysis pregnant women (`1700`) and those women who do not declared their pregnancy status (`1718 + 28 + 5`), comprising a total of `1700 + 1718 + 28 + 5 = 3451` cases. The `28 + 5 = 33` missing cases, reported in the table above, are women who declared to be `unsure` about their pregnancy status; we holded them out from the dataset as well.
 
 
 ```r
