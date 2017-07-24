@@ -261,6 +261,7 @@ In order to make the map data compatible with ours, there are some extra steps t
 ```r
 library(rgeos)
 library(maptools) # Required to load the shp data
+library(mapproj)
 
 # Load the data 
 states.shp <- readShapeSpatial("IND_adm_shp/IND_adm1.shp")
