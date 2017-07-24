@@ -269,9 +269,9 @@ knitr::kable(round(t(tab_part1),digits = 3),format="markdown")
 
 
 |                  | Mixture + Splines|   LDA| Random Forest| Gradient Boosting|
-|:-----------------|------------:|-----:|-------------:|-----------------:|
-|AUC               |        0.799| 0.790|         0.797|             0.803|
-|Misclassification |        0.197| 0.196|         0.196|             0.194|
+|:-----------------|-----------------:|-----:|-------------:|-----------------:|
+|AUC               |             0.799| 0.790|         0.797|             0.803|
+|Misclassification |             0.197| 0.196|         0.196|             0.194|
 
 
 ## Predictive performance: second step
@@ -384,6 +384,6 @@ knitr::kable(round(t(tab_part2),digits = 3),format="markdown")
 
 
 |                  | Mixture + splines|   LDA| Random Forest| Gradient Boosting| Multinomial (De Oliveira et al.)|
-|:-----------------|------------:|-----:|-------------:|-----------------:|--------------------------------:|
-|Misclassification |        0.229| 0.249|         0.234|             0.231|                            0.233|
+|:-----------------|-----------------:|-----:|-------------:|-----------------:|--------------------------------:|
+|Misclassification |              0.230| 0.249|         0.234|             0.231|                            0.233|
 
