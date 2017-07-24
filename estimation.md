@@ -117,17 +117,21 @@ The model and the corresponding sub-models for the `usage choice` are estimated 
 
 
 ```r
-set.seed(123) # We set a seed so that our results are fully reproducible.
-
 # We define the target variable. 
 dataset$target     <- factor(dataset$method!="1. No contraceptive method")
 
 # Estimate the sub-models
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit1_ranef         <- fit_logit(f,dataset$state,dataset$age,dataset,method="ranef",prior1,R,burn_in)
+
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit1_ranef_s       <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="ranef_s",prior1,R,burn_in)
+
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit1_dp_ranef      <- fit_logit(f,dataset$state,dataset$age,dataset,method="dp_ranef",prior1,R,burn_in)
 
 # Estimate the full model
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit1_dp_ranef_s    <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="dp_ranef_s",prior1,R=R,burn_in=burn_in)
 ```
 
@@ -137,8 +141,6 @@ For the `reversibility choice` model we restrict the analysis to the smaller dat
 
 
 ```r
-set.seed(123) # We set a seed so that our results are fully reproducible.
-
 # Subsetting observations
 dataset2            <- dataset[dataset$method != "1. No contraceptive method",]
 
@@ -146,11 +148,17 @@ dataset2            <- dataset[dataset$method != "1. No contraceptive method",]
 dataset2$target     <- factor(dataset2$method != "2. Sterilization") 
 
 # Estimate the sub-models
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit2_ranef         <- fit_logit(f,dataset2$state,dataset2$age,dataset2,method="ranef",prior2,R,burn_in)
+
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit2_ranef_s       <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method="ranef_s",prior2,R,burn_in)
+
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit2_dp_ranef      <- fit_logit(f,dataset2$state,dataset2$age,dataset2,method="dp_ranef",prior2,R,burn_in)
 
 # Estimate the full model
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit2_dp_ranef_s    <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method="dp_ranef_s",prior2,R,burn_in)
 ```
 
@@ -162,8 +170,6 @@ Finally for the `method choice` model we perform similar steps as before. In par
 
 
 ```r
-set.seed(123) # We set a seed so that our results are fully reproducible.
-
 # Subsetting observations
 dataset3            <- dataset2[dataset2$method != "2. Sterilization",]
 
@@ -171,11 +177,17 @@ dataset3            <- dataset2[dataset2$method != "2. Sterilization",]
 dataset3$target     <- factor(dataset3$method != "3. Natural methods") # table(dataset3$target,dataset3$method)
 
 # Estimate the sub-models
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit3_ranef         <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="ranef",prior3,R,burn_in)
+
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit3_ranef_s       <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="ranef_s",prior3,R,burn_in)
+
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit3_dp_ranef      <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="dp_ranef",prior3,R,burn_in)
 
 # Estimate the full model
+set.seed(123) # We set a seed so that our results are fully reproducible.
 fit3_dp_ranef_s    <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="dp_ranef_s",prior3,R,burn_in)
 ```
 
