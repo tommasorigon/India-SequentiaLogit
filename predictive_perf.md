@@ -1,16 +1,16 @@
-# Predictive performance
+# Out-of-Sample Predictive performance
 
 ## Description
 
-In this document we describe how to reproduce the predictive performance discussed in Section 4 of our paper.
+In this document we reproduce the results associated with the out-of-sample predictive assessments discussed in Section 4.1.2 of the paper.
 
-The first part of this document follows closely the estimation procedure of the full model explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. However, we will estimate all the models only on a fraction of the data (about the 75%).
+The first part of this document follows closely the estimation procedure of the full model explained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. However, estimation is based only on a fraction of training data (about the 75%). The remaining 25% is used for evaluating out-of-sample predictive performance.
 
-The estimation process **requires a non-negligible amount of time** to be completed. On standard laptop, this will need a couple of hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in memory without running the following step. 
+The estimation process **requires a non-negligible amount of time** to be completed. On a standard laptop, this will need a couple of hours. We made available the results of the posterior computation in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in the memory without running the following posterior computation step. 
 
-## Model estimation
+## Posterior computation for the semiparametric Bayesian model 
 
-We do not enters in the detail of the following code chunk, since it is almost an exact copy of the one used in the [`estimation.md`]((https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md)) file. However, please note that the models are estimated using a `data_training` dataset. The validation set is stored, instead, in the `data_validation` dataset.
+We do not enter in the details of the following code, since it is almost the same of the one used in the [`estimation.md`]((https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md)) document. However, please note that now the model is estimated using a `data_training` dataset. The validation set is stored, instead, in the `data_validation` dataset.
 
 
 ```r
@@ -104,7 +104,7 @@ save(data_training,
 
 ## Predictive performance
 
-As explained in our paper, the predictive performance are obtained in two steps. We load in memory the required workspaces, as well as the required libraries. Moreover, we define the functions for computing the misclassification rate and other relevant measures.
+As explained in Section 4.1.2 of the paper, the predictive performance is assessed in two steps. We load in the memory the required workspaces, as well as the required libraries. Moreover, we define the functions for computing the misclassification rate and other relevant measures.
 
 
 ```r
@@ -148,7 +148,7 @@ AUC <- function(pred,target){
 }
 ```
 
-Finally, we compute some other quantity of interest (e.g. the design matrix on the validation set). The `data_validation2` object defined below is a `data.frame` of women that are using a contraceptive method and that are a subset of the validation set contained in the `data_validation` dataframe.
+Finally, we compute the design matrix of the women in the validation set to perform out-of-sample prediction. The `data_validation2` object defined below is the `data.frame` comprising the women in the `data_validation` dataset that are using a contraceptive method.
 
 
 ```r
@@ -160,7 +160,7 @@ knots       <- seq(xl - degree * dx, xr + degree * dx, by = dx)
 # First step
 # --------------------
 
-# DP + splines
+# Mixture + splines
 B_val      <- spline.des(knots, data_validation$age, degree + 1, 0 * data_validation$age, outer.ok=TRUE)$design
 X_val_RF   <- dummy(data_validation$state)[,-1]
 X_val_Fix  <- model.matrix(method ~ child + area + religion + education, data = data_validation)[,-1]
@@ -180,17 +180,17 @@ X_val2_Fix  <- model.matrix(method ~ child + area + religion + education, data =
 
 ## Predictive performance: first step
 
-In the first step we evaluate the performance only of the `usage choice` model. The posterior samples of the probability of using a contraceptive are obtained. For each unit, we considered the sample mean of the posterior draws.
+In the first step we evaluate the performance only for the `usage choice` model. The posterior samples of the probability of using a contraceptive are obtained. For each unit, we considered the sample mean of the posterior draws.
 
 
 ```r
-# DP + splines
+# Mixture + splines
 rho1_dp_s <- rowMeans(1/(1+exp(-(X_val_RF%*%t(fit1_dp_ranef_s$beta_RF) + B_val%*%t(fit1_dp_ranef_s$beta_spline) + X_val_Fix%*%t(fit1_dp_ranef_s$beta_Fix)))))
 ```
 
 #### Linear discriminant analysis (LDA)
 
-In the chuck below, it is conducted a linear discriminant analysis for two categories, using the `lda` function of the `MASS` R package.
+In the code below, it is conducted a linear discriminant analysis for two categories, using the `lda` function of the `MASS` R package.
 
 
 ```r
@@ -262,19 +262,21 @@ part1_misclass <- c(missclass(rho1_dp_s,target_val,cutoff),
 # Output
 tab_part1 <- cbind(AUC=part1_AUC,
                    Misclassification=part1_misclass)
-rownames(tab_part1)<- c("DP + Splines","LDA","Random Forest","Gradient Boosting")
+rownames(tab_part1)<- c("Mixture + Splines","LDA","Random Forest","Gradient Boosting")
 knitr::kable(round(t(tab_part1),digits = 3),format="markdown")
 ```
 
 
 
-|                  | DP + Splines|   LDA| Random Forest| Gradient Boosting|
+|                  | Mixture + Splines|   LDA| Random Forest| Gradient Boosting|
 |:-----------------|------------:|-----:|-------------:|-----------------:|
 |AUC               |        0.799| 0.790|         0.797|             0.803|
 |Misclassification |        0.197| 0.196|         0.196|             0.194|
+
+
 ## Predictive performance: second step
 
-For the second step, we evaluated the remaining models jointly, so that we can make a fair comparison with the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). Women not using a contraceptive methods were excluded also from the validation set.
+For the second step, we evaluated the remaining models jointly, so that we can make a fair comparison with the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). Women not using a contraceptive methods were excluded also from the validation set. See discussion in Section 4.1.2.
 
 
 ```r
@@ -282,7 +284,7 @@ rho2 <- 1/(1+exp(-(X_val2_RF%*%t(fit2_dp_ranef_s$beta_RF) + B_val2%*%t(fit2_dp_r
 rho3 <- 1/(1+exp(-(X_val2_RF%*%t(fit3_dp_ranef_s$beta_RF) + B_val2%*%t(fit3_dp_ranef_s$beta_spline) + X_val2_Fix%*%t(fit3_dp_ranef_s$beta_Fix))))
 rho4 <- 1 - rho3
 
-# DP + splines
+# Mixture + splines
 prob_dp_s <- data.frame(Sterilization    =  rowMeans(1 - rho2),
                    TraditionalMethods    =  rowMeans(rho2*rho4), 
                    ModernMethods         =  rowMeans(rho2*rho3))
@@ -290,7 +292,7 @@ prob_dp_s <- data.frame(Sterilization    =  rowMeans(1 - rho2),
 
 #### De Oliveira et al. (2014) model
 
-A multinomial model is estimated in order to reproduce the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). The variable `state` enters in the multinomial specification a a fixed effect. As explained in the paper, the variable `age` enters in the model via a piecewise constant specification.
+A multinomial model is estimated in order to reproduce the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). The variable `state` enters in the multinomial specification as a fixed effect. As explained in the paper, the variable `age` enters in the model via a piecewise constant specification.
 
 
 ```r
@@ -310,7 +312,7 @@ prob_multinom <- predict(fit_multinom,newdata=data_validation2,type="probs")
 
 #### Linear discriminant analysis (LDA)
 
-In the chunck below, it is conducted a linear discriminant analysis.
+In the code below, it is conducted a linear discriminant analysis.
 
 
 ```r
@@ -374,14 +376,14 @@ part2_misclass <- c(missclassM(prob_dp_s,data_validation2$method),
                     )
 
 tab_part2 <- cbind(Misclassification=part2_misclass)
-rownames(tab_part2)<- c("DP + splines","LDA","Random Forest","Gradient Boosting","Multinomial (De Oliveira et al.)")
+rownames(tab_part2)<- c("Mixture + splines","LDA","Random Forest","Gradient Boosting","Multinomial (De Oliveira et al.)")
 
 knitr::kable(round(t(tab_part2),digits = 3),format="markdown")
 ```
 
 
 
-|                  | DP + splines|   LDA| Random Forest| Gradient Boosting| Multinomial (De Oliveira et al.)|
+|                  | Mixture + splines|   LDA| Random Forest| Gradient Boosting| Multinomial (De Oliveira et al.)|
 |:-----------------|------------:|-----:|-------------:|-----------------:|--------------------------------:|
 |Misclassification |        0.229| 0.249|         0.234|             0.231|                            0.233|
 
