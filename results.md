@@ -62,12 +62,12 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 
 
-|             |      DIC|     -2*WAIC|
-|:------------|--------:|--------:|
-|baseline     | 53508.34| 53504.01|
-|splines      | 53094.02| 53089.72|
-|mixture           | 53504.39| 53497.43|
-|mixture + splines | 53090.72| 53083.60|
+|                  |      DIC|  -2*WAIC|
+|:-----------------|--------:|--------:|
+|baseline          | 53507.70| 53503.41|
+|splines           | 53092.90| 53088.62|
+|mixture           | 53505.00| 53498.06|
+|mixture + splines | 53091.25| 53083.61|
 
 
 ## Effects of the variables area, education, religion and child
