@@ -56,13 +56,13 @@ tab[,2] <- -2*tab[,2]
 tab <- tab[,c(1,2)]
 
 rownames(tab) <- c("baseline","splines","mixture", "mixture + splines")
-colnames(tab) <- c("DIC","WAIC")
+colnames(tab) <- c("DIC","-2*WAIC")
 knitr::kable(round(tab,digits=2),format="markdown")
 ```
 
 
 
-|             |      DIC|     WAIC|
+|             |      DIC|     -2*WAIC|
 |:------------|--------:|--------:|
 |baseline     | 53508.34| 53504.01|
 |splines      | 53094.02| 53089.72|
