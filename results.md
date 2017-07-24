@@ -166,7 +166,7 @@ ggsave("img/Age_effect.jpg",p.spline,device="jpg",width=8,height=2.6666)
 ```
 
 
-![](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/Age_effect.jpg)
+![](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/Age_effect.pdf)
 
 
 ## State-specific effects
@@ -203,7 +203,7 @@ ggsave("img/State.pdf",grid.arrange(p1,p2,p3,ncol=1),device="pdf",width=7.8,heig
 ggsave("img/State.jpg",grid.arrange(p1,p2,p3,ncol=1),device="jpg",width=7.8,height=9)
 ```
 
-![](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/State.jpg)
+![](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/State.pdf)
 
 ## State-specific effects: clustering and maps
 
