@@ -40,7 +40,7 @@ f_s <- as.formula(target ~ child + area + religion + education)
 
 As discussed in Section 4 of the paper, we fix the hyperparameters for the Gaussian kernels in the mixture of Gaussians prior for the state-specific effects, via a data driven approach. The following code provides the details associated with this data driven prior calibration procedure. 
 
-In particular, we first estimate a classical generalized linear model for the `usage choice`, the `reversibility choice`, and the `method choice`, respectively. Then, we cluster the `state`-specific parameters, treated here as fixed effect, via hieriarchical clustering with complete linkage. The number of clusters is selected via graphical inspection of the dendrograms. Finally, we compute the average variance within cluster, and the average of the squared cluster means, for all the models. These quantities will be helpful in specifying hyperparameters. See Section 4 of the paper for a detailed discussion.
+In particular, we first estimate a classical generalized linear model for the `usage choice`, the `reversibility choice`, and the `method choice`, respectively. Then, we cluster the `state`-specific parameters, treated here as fixed effects, via hierarchical clustering with complete linkage. The number of clusters is selected via graphical inspection of the dendrograms. Finally, we compute the average variance within cluster, and the average of the squared cluster means, for all the models. These quantities will be helpful in specifying the hyperparameters. See Section 4 of the paper for a detailed discussion.
 
 
 ```r
@@ -109,7 +109,7 @@ prior3 <- list(P_Fix_const=1e-2,
 ```
 
 
-The entire estimation process **requires a non-negligible amount of time** to be completed. On a standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chains in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in the memory directly, without running the next posterior computation steps.
+The entire estimation process **requires a non-negligible amount of time** to be completed. On a standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chains in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in the memory directly, without running the posterior computation algorithms described below.
 
 #### 1. Usage choice
 
@@ -122,7 +122,7 @@ set.seed(123) # We set a seed so that our results are fully reproducible.
 # We define the target variable. 
 dataset$target     <- factor(dataset$method!="1. No contraceptive method")
 
-# Estimate the submodels
+# Estimate the sub-models
 fit1_ranef         <- fit_logit(f,dataset$state,dataset$age,dataset,method="ranef",prior1,R,burn_in)
 fit1_ranef_s       <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="ranef_s",prior1,R,burn_in)
 fit1_dp_ranef      <- fit_logit(f,dataset$state,dataset$age,dataset,method="dp_ranef",prior1,R,burn_in)
@@ -145,7 +145,7 @@ dataset2            <- dataset[dataset$method != "1. No contraceptive method",]
 # We define the new target variable. 
 dataset2$target     <- factor(dataset2$method != "2. Sterilization") 
 
-# Estimate the submodels
+# Estimate the sub-models
 fit2_ranef         <- fit_logit(f,dataset2$state,dataset2$age,dataset2,method="ranef",prior2,R,burn_in)
 fit2_ranef_s       <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method="ranef_s",prior2,R,burn_in)
 fit2_dp_ranef      <- fit_logit(f,dataset2$state,dataset2$age,dataset2,method="dp_ranef",prior2,R,burn_in)
@@ -170,7 +170,7 @@ dataset3            <- dataset2[dataset2$method != "2. Sterilization",]
 # We define the new target variable. 
 dataset3$target     <- factor(dataset3$method != "3. Natural methods") # table(dataset3$target,dataset3$method)
 
-# Estimate the submodels
+# Estimate the sub-models
 fit3_ranef         <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="ranef",prior3,R,burn_in)
 fit3_ranef_s       <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="ranef_s",prior3,R,burn_in)
 fit3_dp_ranef      <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="dp_ranef",prior3,R,burn_in)
@@ -196,7 +196,7 @@ save(fit1_ranef_s,
      fit2_ranef_s,
      fit3_ranef_s,file="workspaces/ranef_s.RData")
 
-# DP
+# Mixtures
 save(fit1_dp_ranef,
      fit2_dp_ranef,
      fit3_dp_ranef,
@@ -227,7 +227,7 @@ load("workspaces/dp_ranef.RData")
 load("workspaces/dp_ranef_s.RData")
 ```
 
-The chain are converted according the the standards of the [`coda`](https://cran.r-project.org/web/packages/coda/index.html) R package.
+The chain are converted according the standards of the [`coda`](https://cran.r-project.org/web/packages/coda/index.html) R package.
 
 
 ```r
@@ -252,7 +252,7 @@ The effective sample size is monitored using the function `effectiveSize` of the
 
 
 ```r
-# Effective sample size of RANDOM EFFECTS
+# Effective sample size of STATE SPECIFIC EFFECTS
 tab1 <- round(rbind(quantile(effectiveSize(beta_RF1),c(0.25,0.5,0.75)),
 quantile(effectiveSize(beta_RF2),c(0.25,0.5,0.75)),
 quantile(effectiveSize(beta_RF3),c(0.25,0.5,0.75))))
