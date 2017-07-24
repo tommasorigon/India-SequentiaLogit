@@ -189,18 +189,18 @@ The qualitative variables `education`, `religion`, and `child`, are measured on 
 
 - `education`. We create a four level factor for education (No education, Low , Intermediate, and High).
 - `religion`. We consider the most frequent religions in India (Hindu, Muslim, Christian), and we grouped the other religions in a single category: Others.
-- `child`. We consider a three level factor for the number of child: none, one or more than one. The `More than 1` category is fixed as baseline.
+- `child`. We consider a three level factor for the number of children: none, one, or more than one. The `More than 1` category is fixed as baseline.
 
 The `R` code to perform these operations is:
 
 ```r
-# Grouping levels of education
+# Grouping categories of education
 levels(dataset$education) <- c("None", rep("Low", 5), rep("Intermediate", 6), rep("High", 5))
 
-# Grouping levels of religion
+# Grouping categories of religion
 levels(dataset$religion) <- c("Hindu", "Muslim", "Christian", rep("Other", 6))
 
-# Relabeling numbers of child
+# Relabeling numbers of children
 dataset$child[dataset$child > 1] <- "More than 1"
 dataset$child <- as.factor(dataset$child)
 dataset$child <- factor(dataset$child,levels=levels(dataset$child)[c(3,1,2)])
@@ -219,12 +219,12 @@ See Section 1.1 of the paper for a justification on the definition of these four
 # Converting variable into a factor
 dataset$method <- factor(as.character(dataset$method))
 
-# Relabeling method levels
+# Relabeling method categories
 levels(dataset$method)[c(6,7,10)] <- "2. Sterilization"   
 levels(dataset$method)[c(7,8)] <- "3. Natural methods"
 levels(dataset$method)[c(1,2,3,4,5)] <- "4. Modern methods"
 
-# Reorder the levels
+# Reorder the categories
 dataset$method <- factor(as.character(dataset$method))
 ```
 
