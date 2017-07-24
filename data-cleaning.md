@@ -102,7 +102,7 @@ dataset <- filter(dataset, pregnant == "(0) No 0")
 
 #### 2. Contraceptive usage and method usage
 
-Similarly, the `method` variable has some "structural" missingness, due to the fact that only women using contraceptives are asked about the contraceptive `method`. Hence, women having missing values in the `method` variable, but non-missing values in the `contraceptive` variable, should be kept as cases of woman using no contraceptive methods. Instead, women having missing values both in the `method` and `contraceptive` variables, should be removed, since we do not have information on contraceptive behavior for these women. To perform this operation, we first create an additional level in the `method` variable (called `1. No contraceptive method`) to distinguish between these two different cases of missingness.
+Similarly, the `method` variable has some "structural" missingness, due to the fact that only women using contraceptives are asked about the contraceptive `method`. Hence, women having missing values in the `method` variable, but non-missing values in the `contraceptive` variable, should be kept as cases of women using no contraceptive methods. Instead, women having missing values both in the `method` and `contraceptive` variables, should be removed, since we do not have information on contraceptive behavior for these women. To perform this operation, we first create an additional level in the `method` variable (called `1. No contraceptive method`) to distinguish between these two different cases of missingness.
 
 
 ```r
