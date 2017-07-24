@@ -2,9 +2,9 @@
 
 ## Results
 
-This part of the tutorial will reproduce the main results of the paper, including the computation of the DIC and WAIC indexes, the graphs and the tables.
+This documentation reproduces the main results provided in Section 4 of the paper, including the computation of the DIC and WAIC indexes, the graphs and the tables.
 
-The results of the MCMC chain available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, previously obtained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in memory, as well as the cleaned obtained in the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) step, and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R). Please note that the `dataset` **is not made available** in this GitHub repository.
+The results of the MCMC chain available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, previously obtained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in the memory, along with the cleaned dataset obtained in the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) document, and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R). Again note that the `dataset` **is not made available** in this GitHub repository.
 
 
 
@@ -33,7 +33,7 @@ source("core_functions.R")
 
 ## Information criteria (DIC and WAIC)
 
-Following [Gelman et al. (2014)](https://link.springer.com/article/10.1007/s11222-013-9416-2) we compute the DIC (Deviance Information Criterion) and WAIC (Watanabe-Akaike information criterion) indexes. They can be done by using the `IC` function, included in the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file. For each model, the IC function return both the DIC and the WAIC but also the effective degree of freedom for each model (not reported in the paper).
+Following [Gelman et al. (2014)](https://link.springer.com/article/10.1007/s11222-013-9416-2) we compute the DIC (Deviance Information Criterion) and WAIC (Watanabe-Akaike information criterion) indexes. This can be done by using the `IC` function, included in the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file. For each model, the IC function returns both the DIC, and the WAIC.
 
 Notice that the factorization of our likelihood allows to decompose the DIC and WAIC indexes, that is
 
@@ -43,7 +43,7 @@ and similarly
 
 > WAIC = WAIC_Usage + WAIC_Reversibility + WAIC_Method
 
-The construction of the table of section 4 is as follows:
+The code to obtain Table 1 in the paper is provided below.
 
 
 ```r
@@ -72,7 +72,7 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 ## Fixed effects table
 
-In the following, we compute the posterior mean of the fixed effect coefficients, together with a 0.95% credible interval. 
+In the following, we compute the posterior mean of the fixed effect coefficients, together with the 0.95% credible intervals. 
 
 
 ```r
@@ -112,7 +112,7 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 ## Age effect
 
-The `age` effect is obtained by computing the posterior mean of each function f_k(). The first step consists in constructing the B-spline basis function evaluated among the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package. In the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file, the construction of the `B` matrix proceeds exactly in the same way. 
+The `age` effect is obtained by computing the posterior mean of each function f_k(). The first step consists in constructing the B-spline basis function evaluated in the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package. In the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file, the construction of the `B` matrix proceeds exactly in the same way. 
 
 
 ```r
@@ -136,7 +136,7 @@ ncol(B)
 ## [1] 42
 ```
 
-Then, the graph can be obtained then as follow
+Then, the Figure 3 can be obtained as follow
 
 
 ```r
@@ -209,7 +209,7 @@ ggsave("img/State.jpg",grid.arrange(p1,p2,p3,ncol=1),device="jpg",width=7.8,heig
 
 Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `medv` function allows to reproduce the work of [Medvedovic et al. (2002)](https://www.cs.princeton.edu/~bee/courses/read/medvedovic-bioinformatics-2002.pdf).
 
-The following chunk of code allows to obtained the cluster labels for the `Usage choice`, `Reversibility choice` and the `Method choice` models. The output of the clustering procedure is omitted, but the is reported below as well 
+The following code allows to obtain the cluster labels for the `Usage choice`, `Reversibility choice` and the `Method choice` models. Interesting clusters (mostly associated with the `Usage choice` model) are also reported.
 
 
 ```r
@@ -249,19 +249,9 @@ levels(dataset$state)[-1][clust1_med==2]
 ## [1] "Assam"     "Manipur"   "Meghalaya" "Mizoram"   "Nagaland"
 ```
 
-```r
-## Reversibility choice
-# levels(dataset$state)[-1][clust2_lau==1]
-# levels(dataset$state)[-1][clust2_lau==2]
-
-## Method choice
-# levels(dataset$state)[-1][clust3_lau==1]
-# levels(dataset$state)[-1][clust3_lau==2]
-```
-
 The graphical representation of India requires additional external files, which **are not provided** in the GitHub repository, but can be dowloaded for free from the [Global Administrative Areas](http://www.gadm.org/) website. We downloaded the data for India in the `shapefile` format. Refer to the documentation of the [Global Administrative Areas](http://www.gadm.org/) for further information about the data source.
 
-In order to make the map data compatible with ours, there are some extra steps to do. Having loaded the data in memory, we compare which States is present in the map but not included in the survey. In many cases, it is just a matter of relabeling (e.g. from `Dadra and Nagar Haveli` to `Dadra+Nagar Haveli`). However, some cases require special attention:
+In order to make the map data compatible with ours, there are some extra steps to do. Having loaded the data in memory, we compare which States are present in the map but not included in the survey. In many cases, it is just a matter of relabeling (e.g. from `Dadra and Nagar Haveli` to `Dadra+Nagar Haveli`). However, some cases require special attention:
 
 1. As mentioned, `Dadra and Nagar Haveli`, `Daman and Diu`, `Jammu and Kashmir`,`Odisha` and `Puducherry` can be relabelled to be coherent with the names of the our survey.
 2. For `Andaman and Nicobar` and `Lakshadweep`, both small islands, we do not have any observation in our dataset, and they will be ignored.
@@ -321,7 +311,7 @@ states.shp$NAME_1 <- as.factor(states.shp$NAME_1)
 states.shp.f <- fortify(states.shp, region = "ID_1")
 ```
 
-The graph are obtained as follow, computing the mean of the posterior means. The baseline State `Uttar Pradesh` was fixed equal to 0.
+The graphs are obtained as follow, leveraging the posterior median of each state-specific effect in the three different models. The baseline State `Uttar Pradesh` was fixed equal to 0.
 
 
 ```r
