@@ -166,7 +166,7 @@ ggsave("img/Age_effect.jpg",p.spline,device="jpg",width=8,height=2.6666)
 ```
 
 
-![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/Age_effect.jpg)
+![](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/Age_effect.jpg)
 
 
 ## State-specific effects
