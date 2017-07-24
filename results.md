@@ -4,7 +4,7 @@
 
 This documentation reproduces the main results provided in Section 4 of the paper, including the computation of the DIC and WAIC indexes, the graphs and the tables.
 
-The results of the MCMC chain available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, previously obtained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in the memory, along with the cleaned dataset obtained in the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) document, and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R). Again note that the `dataset` **is not made available** in this GitHub repository.
+The results of posterior computation are available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, and have been previously obtained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in the memory, along with the cleaned dataset obtained in the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) document, and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R). Again note that the `dataset` **is not made available** in this GitHub repository.
 
 
 
@@ -70,9 +70,9 @@ knitr::kable(round(tab,digits=2),format="markdown")
 |DP + splines | 53090.72| 53083.60|
 
 
-## Fixed effects table
+## Effects of the variables area, education, religion and child
 
-In the following, we compute the posterior mean of the fixed effect coefficients, together with the 0.95% credible intervals. 
+In the following, we compute the posterior mean of the effects of the variables `area`, `education`, `religion` and `child`, together with the 0.95% credible intervals. 
 
 
 ```r
@@ -110,9 +110,9 @@ knitr::kable(round(tab,digits=2),format="markdown")
 |high         |         0.26|          0.16|          0.38|                 1.28|                  1.15|                  1.41|          1.16|           0.98|           1.34|
 
 
-## Age effect
+## Age effects
 
-The `age` effect is obtained by computing the posterior mean of each function f_k(). The first step consists in constructing the B-spline basis function evaluated in the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package. In the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file, the construction of the `B` matrix proceeds exactly in the same way. 
+The `age` effect is obtained by computing the posterior mean of each function f_k(), along with the 0.95% point-wise credible intervals. The first step consists in constructing the B-spline basis function evaluated on the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package. In the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file, the construction of the `B` matrix proceeds exactly in the same way. 
 
 
 ```r
@@ -125,7 +125,7 @@ knots <- seq(xl - degree * dx, xr + degree * dx, by = dx)
 B        <- spline.des(knots, 15:49, degree + 1, 0 * 15:49, outer.ok=TRUE)$design
 ```
 
-The final number of columns of `B`, to which is associated an equal number of coefficients, is
+The final number of columns of `B`, coinciding with the total number of splines coefficients, is
 
 
 ```r
@@ -169,9 +169,9 @@ ggsave("img/Age_effect.jpg",p.spline,device="jpg",width=8,height=2.6666)
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/Age_effect.jpg)
 
 
-## Random effects: graphs
+## State-specific effects
 
-In the following, we reproduce the boxplots for the random effects.
+In the following, we reproduce the boxplots for the state-specific effects (see Figure 4).
 
 
 ```r
@@ -205,7 +205,7 @@ ggsave("img/State.jpg",grid.arrange(p1,p2,p3,ncol=1),device="jpg",width=7.8,heig
 
 ![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/State.jpg)
 
-## Random effects: clustering and maps
+## State-specific effects: clustering and maps
 
 Clustering States will require additional libraries. We will make use of the ['mcclust'](https://cran.r-project.org/web/packages/mcclust/index.html) R package, which is based on the paper of [Fritsch and Ickstadt (2009)](https://projecteuclid.org/download/pdf_1/euclid.ba/1340370282). In particular, the `medv` function allows to reproduce the work of [Medvedovic et al. (2002)](https://www.cs.princeton.edu/~bee/courses/read/medvedovic-bioinformatics-2002.pdf).
 
@@ -311,7 +311,7 @@ states.shp$NAME_1 <- as.factor(states.shp$NAME_1)
 states.shp.f <- fortify(states.shp, region = "ID_1")
 ```
 
-The graphs are obtained as follow, leveraging the posterior median of each state-specific effect in the three different models. The baseline State `Uttar Pradesh` was fixed equal to 0.
+The maps in Figure 4 are obtained as follow, leveraging the posterior median of each state-specific effect in the three different models. The baseline State `Uttar Pradesh` was fixed equal to 0.
 
 
 ```r
