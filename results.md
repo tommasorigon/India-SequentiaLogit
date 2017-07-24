@@ -1,4 +1,4 @@
-# Results: DIC/ WAIC indexes, graphs and tables
+# Results: DIC/WAIC indexes, graphs and tables
 
 ## Results
 
