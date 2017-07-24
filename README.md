@@ -11,7 +11,7 @@ The documentation is organized in four sections described below.
 
 These sections should be executed in order.
 
-In the repository we also made available the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) which contains the core functions---such as the Gibbs sampling algorithm described in detail in Section 3 of the paper.
+In the repository we also made available the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) which contains the core functions, such as the Gibbs sampling algorithm described in detail in Section 3 of the paper.
 
 ## Shiny application
 
