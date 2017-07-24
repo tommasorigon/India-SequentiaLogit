@@ -28,7 +28,7 @@ dim(da36151.0003)
 
 ## Selection of the variables of interest
 
-Among all the 580 variables we select only those of interest for our analysis (or relevant for data cleaning operations). Refer to Section 1.1 of the paper for a discussion on the covariates of interest. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact questions posed to each eligible woman are instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables:
+Among all the 580 variables we select only those of interest for our analysis (or relevant for data cleaning operations). Refer to Section 1.1 of the paper for a discussion on the response, and the covariates of interest. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact questions posed to each eligible woman are instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables:
 
 - `STATEID`. Relabeled as `state`, represents the name of the State where each woman lives.
 - `EW6`. Relabeled as `age`, represents the age of each eligible woman in 2011.
