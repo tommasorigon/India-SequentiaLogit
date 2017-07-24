@@ -15,7 +15,7 @@ In the repository we also made available the file [`core_functions.R`](https://g
 
 ### Shiny application
 
-We also provide a [Shiny application](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/SequentiaLogisticApp) in which, for every combination of covariates characterizing the different women profiles, the posterior probabilities of the corresponding contraceptive preferences, and the sequential probabilities in Figure 1, are computed. The characteristics of each woman (e.g. `AGE`, `CHILD`, etc.) can be defined interactively by the user.
+We also provide a [Shiny application](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/SequentiaLogisticApp) in which, for every combination of covariates characterizing the different women profiles, the posterior probabilities of the corresponding contraceptive preferences, and the sequential probabilities in Figure 1, are computed. The characteristics of each woman (e.g. `age`, `child`, etc.) can be defined interactively by the user.
 
 The application relies on three `R` packages: `shiny`, `shinydashboard` and `ggplot2`. If not already available, these packages **should be installed** using the `R` function `install.packages()`. Once these packages are installed, the Shiny application can be launched by executing the following `R` code.
 
