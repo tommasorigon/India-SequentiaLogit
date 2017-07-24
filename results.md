@@ -55,7 +55,7 @@ IC(fit1_dp_ranef_s) + IC(fit2_dp_ranef_s) + IC(fit3_dp_ranef_s))
 tab[,2] <- -2*tab[,2]
 tab <- tab[,c(1,2)]
 
-rownames(tab) <- c("baseline","splines","DP", "DP + splines")
+rownames(tab) <- c("baseline","splines","mixture", "mixture + splines")
 colnames(tab) <- c("DIC","WAIC")
 knitr::kable(round(tab,digits=2),format="markdown")
 ```
@@ -66,8 +66,8 @@ knitr::kable(round(tab,digits=2),format="markdown")
 |:------------|--------:|--------:|
 |baseline     | 53508.34| 53504.01|
 |splines      | 53094.02| 53089.72|
-|DP           | 53504.39| 53497.43|
-|DP + splines | 53090.72| 53083.60|
+|mixture           | 53504.39| 53497.43|
+|mixture + splines | 53090.72| 53083.60|
 
 
 ## Effects of the variables area, education, religion and child
