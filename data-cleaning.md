@@ -4,13 +4,13 @@
 
 ## The Indian Human Development Survey-II (IHDS-II)
 
-This short document explain in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset in our paper. From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
+This short document explains in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset in our paper. From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
 
 > The India Human Development Survey-II (IHDS-II), 2011-12 is a nationally representative, multi-topic survey of 42,152 households in 1,420 villages and 1,042 urban neighborhoods across India. These data are mostly re-interviews of households interviewed for IHDS (ICPSR 22626) in 2004-05.
 
-We cannot redistribute the data, but they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is completely free. 
+We cannot redistribute the data, but they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is completely free. We focus on the `R` version of the dataset called **DS3: Eligible Women**. The download provides a zip directory `ICPSR_36151.zip` which contains data and additional documentation. The `R` dataset `36151-0003-Data.rda` of interest can be found in the sub-directory `DS0003`.
 
-We have used the dataset called **DS3: Eligible Women**. Eligible women are ever-married women aged 15 - 49. Those ever-married women older than 49 years that were interviewed in the initial IHDS wave, **are included in the dataset even if they are not eligible anymore**. Non-eligible women will be excluded from the dataset.
+Eligible women are ever-married women aged 15 - 49. Those ever-married women older than 49 years that were interviewed in previous IHDS waves, **are included in the dataset even if they are no more eligible**. Non-eligible women will be excluded from the dataset.
 
 
 ```r
@@ -26,20 +26,20 @@ dim(da36151.0003)
 ## [1] 39523   580
 ```
 
-## Selection of the variable of interest
+## Selection of the variables of interest
 
-Among all the 580 variables we select only those which we will include in our analysis. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact questions posed to each eligible woman are instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables
+Among all the 580 variables we select only those of interest for our analysis (or relevant for data cleaning operations). Refer to Section 1.1 of the paper for a discussion on the covariates of interest. The variables of interest are coded according a [codebook](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1207405&path=ICPSR). The exact questions posed to each eligible woman are instead described in the [questionnaire](http://www.icpsr.umich.edu/cgi-bin/file?comp=none&study=36151&ds=3&file_id=1212084&path=ICPSR). We considered the following variables:
 
 - `STATEID`. Relabeled as `state`, represents the name of the State where each woman lives.
 - `EW6`. Relabeled as `age`, represents the age of each eligible woman in 2011.
-- `EW8`. Relabeled as `education`, represents the year of education completed (illiterate=00,5th class=05, bachelors=15, above bachelors=16).
+- `EW8`. Relabeled as `education`, represents the year of education completed.
 - `EW9`. Relabeled as `child`, represents the number of children alive.
 - `ID11`. Relabeled as `religion`, represents the religion of the head of the household.
 - `URBAN2011`. Relabeled as `area`, represents the urban residence from census 2011.
-- `FP1`.  Relabeled as `pregnant`, represents whether the woman is currently pregnant or not.
-- `FP2A`. Relabeled as `contraceptive` indicates whether a woman is using a contraceptive method, provided that she is not pregnant.
-- `FP2B`. Relabeled as `method`, represents the main contraceptive method adopted, provided that she is using one contraception.
-- `EWELIGIBLE`. Relabeled as `eligible`, represents the eligible women in the dataset (women 15-49, ever married).
+- `FP1`.  Relabeled as `pregnant`, defines whether the woman is currently pregnant or not.
+- `FP2A`. Relabeled as `contraceptive` indicates whether the woman is using a contraceptive method, provided that she is not pregnant.
+- `FP2B`. Relabeled as `method`, represents the main contraceptive method adopted, provided that the woman is using contraceptives.
+- `EWELIGIBLE`. Relabeled as `eligible`, defines whether the woman is eligible or not (women 15-49, ever married).
 
 
 
@@ -49,7 +49,7 @@ library(dplyr)
 # Conversion of the dataframe into a more manageable class
 IHDS_II <- tbl_df(da36151.0003); rm(da36151.0003)
 
-# Selection of relevant questions
+# Selection of relevant variables
 dataset <- IHDS_II %>% transmute(state = STATEID, 
                                  age = EW6, 
                                  education = EW8, 
@@ -62,9 +62,9 @@ dataset <- IHDS_II %>% transmute(state = STATEID,
                                  eligible= EWELIGIBLE)
 ```
 
-## Selecting eligible women
+## Selection of eligible women
 
-We select only eligible women, that is, ever married women and aged 15 - 49. Notice that among eligible women there is **one woman** who declared to be 81; we discarded that women as well, since it seems to be either a transcription error or another kind of gross error.
+We select only eligible women (i.e. ever married women and aged 15 - 49). Notice that among the eligible women there is **one woman** who declared to be 81. We discarded this woman as well, since it seems to be either a transcription error or another kind of gross error.
 
 
 ```r
@@ -72,9 +72,9 @@ dataset <- dataset %>% filter(eligible=="(1) Yes 1")
 dataset <- dataset %>% filter(age <= 49)
 ```
 
-Eligible units comprise a total of 35281 observations.
+Eligible women comprise a total of 35281 observations.
 
-## Missing values 
+## Cleaning missing or not coherent values 
 
 #### 1. Pregnancy and contraceptive usage
 
@@ -93,7 +93,7 @@ table(dataset$pregnant, dataset$contraceptive, useNA="always")
 ##   <NA>            28         5  1718
 ```
 
-We decided to exclude from the analysis pregnant women (`1700`) and those women who do not declared their pregnancy status (`1718 + 28 + 5`), comprising a total of `1700 + 1718 + 28 + 5 = 3451` cases. The `28 + 5 = 33` missing cases, reported in the table above, are women who declared to be `unsure` about their pregnancy status; we holded them out from the dataset as well.
+We decided to exclude from the analysis pregnant women (`1700`), and those women who do not declared their pregnancy status (`1718 + 28 + 5`), comprising a total of `1700 + 1718 + 28 + 5 = 3451` cases. The `28 + 5 = 33` missing cases reported in the table above, are women who declared to be `unsure` about their pregnancy status. We held them out from the dataset as well.
 
 
 ```r
@@ -103,7 +103,7 @@ dataset <- filter(dataset, pregnant == "(0) No 0")
 
 #### 2. Contraceptive usage and method usage
 
-Similarly, the `method` variable present some "structural" missingness. Women not using any kind of contraception were not aked about the contraception method adopted. In practive, we create an additional level called `1. No contraceptive method` to distinguish between real and structural missing values.
+Similarly, the `method` variable has some "structural" missingness, due to the fact that only women using contraceptives are asked about the contraceptive `method`. Hence, women having missing values in the `method` variable, but non-missing values in the `contraceptive` variable, should be kept as cases of woman using no contraceptive methods. Instead, woman having missing values both in the `method` and `contraceptive` variables, should be removed, since we do not have information on contraceptive behavior for these women. To perform this operation, we first create an additional level in the `method` variable (called `1. No contraceptive method`) to distinguish between these two cases.
 
 
 ```r
@@ -111,7 +111,7 @@ dataset$method <- as.character(dataset$method)
 dataset$method[dataset$contraceptive == "(0) No 0"] <- "1. No contraceptive method"
 ```
 
-Then, we excluded from the analysis the remaining missing values (879 observations), as well as those women who declare to use "others" contraceptive methods (417 observations).
+Then, consistent with the above discussion, we hold out only the real cases of missingness (879 observations), as well as those women who declare to use "others" contraceptive methods (417 observations).
 
 
 ```r
@@ -121,7 +121,7 @@ dataset <- filter(dataset, method!="(11) Others 11")
 
 #### 3. Other missingness
 
-Unfortunately, there are still some missing values but their number is negligible (3 and 7), and therefore we can safely exclude them from the analysis. 
+There are still some missing values in the covariates, but their number is negligible (3 and 7), and therefore we can safely exclude them from the analysis. 
 
 
 ```r
@@ -144,15 +144,15 @@ summary(subset(dataset,select=c(education, child)))
 dataset <- filter(dataset, !is.na(contraceptive), !is.na(education),  !is.na(child))
 ```
 
-The dataset now comprises a total of 30524 observations out of the original `35281`, which is the number of eligible women.
+The final dataset comprises a total of `30524` observations out of the original `35281`.
 
 ## Relabeling variables and categories
 
-In this section, we change the name of some categories and we fix the baseline for some factor variables. The category `Delhi` is relabelled `NCT of Delhi` and `Uttar Pradesh` is fixed as baseline level.
+In this section, we slightly modify the name of some categories for aesthetical reasons. This is accomplished via the function `str_sub()` which deletes unnecessary numbers and ids in the name of some categories. We also fix, for each categorical variable, its baseline consistent with those considered in the paper. Note also that, for the `state` variable the category `Delhi` is relabelled `NCT of Delhi` and `Uttar Pradesh` is fixed as baseline category.
 
 
 ```r
-# This part "clean" the name of some variables - just for aesthetical reasons.
+# This part "modifies" the name of some variables - just for aesthetical reasons.
 library(stringr)
 levels(dataset$state)     <- str_sub(levels(dataset$state), 6, -4)
 levels(dataset$education) <- str_sub(levels(dataset$education), 6, -2)
@@ -161,12 +161,12 @@ levels(dataset$contraceptive) <- str_sub(levels(dataset$contraceptive), 5, -3)
 levels(dataset$method)    <- str_sub(levels(dataset$method), 6, -3)
 levels(dataset$religion)  <- str_sub(levels(dataset$religion), 5, -3)
 
-# Re-order alphabetically the levels
+# Re-order alphabetically the categories
 dataset$state <- factor(as.character(dataset$state))
-# State levels
+# State categories
 levels(dataset$state)[levels(dataset$state)=="Delhi"] <- "NCT of Delhi"
 
-# Uttar pradesh is now the baseline level.
+# Uttar pradesh is now the baseline category.
 new_levels    <- c("Uttar Pradesh",levels(dataset$state)[-which(levels(dataset$state)=="Uttar Pradesh")])
 dataset$state <- factor(dataset$state,levels=new_levels); rm(new_levels)
 levels(dataset$state)
@@ -186,13 +186,13 @@ levels(dataset$state)
 ## [31] "Tripura"            "Uttarakhand"        "West Bengal"
 ```
 
-Then, we grouped some of the covariates labels as follow:
+The qualitative variables `education`, `religion`, and `child`, are measured on several categories. To maintain simple interpretation, and consistent with other studies on contraceptive preferences in India, we aggregate some of these categories. In particular:
 
-- `education`. We create a four level factor for education (No education, Low , Intermediate and High).
-- `religion`. We considered the most frequent religions in India (Hindu, Muslim, Christian), and we gropued the other religions together.
-- `child`. We considered a three level factor for the number of child: none, one or more than one. The `More than 1` category is fixed as baseline.
+- `education`. We create a four level factor for education (No education, Low , Intermediate, and High).
+- `religion`. We consider the most frequent religions in India (Hindu, Muslim, Christian), and we grouped the other religions in a single category Others.
+- `child`. We consider a three level factor for the number of child: none, one or more than one. The `More than 1` category is fixed as baseline.
 
-
+The `R` code to perform these operations is:
 
 ```r
 # Grouping levels of education
@@ -207,13 +207,14 @@ dataset$child <- as.factor(dataset$child)
 dataset$child <- factor(dataset$child,levels=levels(dataset$child)[c(3,1,2)])
 ```
 
-The variable `method` is the response variable, which is composed by the following levels:
+The variable `method` is the response variable, and is composed by the following levels:
 
 - `1. No contraceptive method`
 - `2. Sterilization`. Includes female sterilization, hysteroctomy and male sterilization.
 - `3. Natural methods`. Includes periodic abstinence and withdrawal
 - `4. Modern methods`. Includes condom, copper T/IUD, diaphgram / jelly, injectible contraception and oral pill
 
+See Section 1.1 of the paper for a justification on the definition of these four categories. The `R` code to create the final response variable is:
 
 ```r
 # Converting variable into a factor
@@ -228,7 +229,7 @@ levels(dataset$method)[c(1,2,3,4,5)] <- "4. Modern methods"
 dataset$method <- factor(as.character(dataset$method))
 ```
 
-The response variable is therefore composed as follows
+The final response variable is composed as follows
 
 
 ```r
@@ -270,7 +271,7 @@ str(dataset)
 
 ## Descriptive analysis
 
-The following commands reproduce the graph of Section one of our paper.
+The following commands reproduce Figure 2 of our paper,  describing an empirical relation between the variable `age` and the probability of the different contraceptive choices.
 
 
 ```r
