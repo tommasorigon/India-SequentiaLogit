@@ -8,9 +8,9 @@ This short document explains in detail all the preliminary operations performed 
 
 > The India Human Development Survey-II (IHDS-II), 2011-12 is a nationally representative, multi-topic survey of 42,152 households in 1,420 villages and 1,042 urban neighborhoods across India. These data are mostly re-interviews of households interviewed for IHDS (ICPSR 22626) in 2004-05.
 
-We cannot redistribute the data, but they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is completely free. We focus on the `R` version of the dataset called **DS3: Eligible Women**. The download provides a zip directory `ICPSR_36151.zip` which contains data and additional documentation. The `R` dataset `36151-0003-Data.rda` of interest can be found in the sub-directory `DS0003`.
+We cannot redistribute the data, but they can be downloaded from the [Data Sharing for Demographic Research Archive](http://www.icpsr.umich.edu/icpsrweb/ICPSR/studies/36151) at ICPSR. Download will require a registration but is completely free. We focus on the `R` version of the dataset called **DS3: Eligible Women**. The download provides a zip directory `ICPSR_36151.zip` which contains data and additional documentation. The `R` dataset `36151-0003-Data.rda` of interest is in the sub-directory `DS0003`.
 
-Eligible women are ever-married women aged 15 - 49. Those ever-married women older than 49 years that were interviewed in previous IHDS waves, **are included in the dataset even if they are no more eligible**. Non-eligible women will be excluded from the dataset.
+Eligible women are ever-married women aged 15 - 49. Non-eligible women will be excluded from the dataset.
 
 
 ```r
