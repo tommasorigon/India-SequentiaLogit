@@ -27,7 +27,7 @@ body <- dashboardBody(
                h4("Sequential probabilities"),
                p("The values below represent the posterior estimate of the conditional probabilities associated to the sequential process."),
                tableOutput("conditional"),
-               h4("Marginal probabilities"),
+               h4("Contraceptive choice"),
                p("The values below represent the posterior estimate of the probabilities of each contraceptive choice. Their summation is equal to one."),
                tableOutput("marginal")
            ),
