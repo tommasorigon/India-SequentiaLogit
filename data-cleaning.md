@@ -93,17 +93,16 @@ table(dataset$pregnant, dataset$contraceptive, useNA="always")
 ##   <NA>            28         5  1718
 ```
 
-We decided to exclude from the analysis pregnant women (`1700`), and those women who do not declared their pregnancy status (`1718 + 28 + 5`), comprising a total of `1700 + 1718 + 28 + 5 = 3451` cases. The `28 + 5 = 33` missing cases reported in the table above, are women who declared to be `unsure` about their pregnancy status. We held them out from the dataset as well.
+We decided to exclude from the analysis pregnant women (`1700`), and those women who do not declare their pregnancy status (`1718 + 28 + 5`), comprising a total of `1700 + 1718 + 28 + 5 = 3451` cases. The `28 + 5 = 33` missing cases reported in the table above, are women who declared to be `unsure` about their pregnancy status. We held them out from the dataset as well.
 
 
 ```r
-# Notice that the following command will exclude also missing values.
 dataset <- filter(dataset, pregnant == "(0) No 0")
 ```
 
 #### 2. Contraceptive usage and method usage
 
-Similarly, the `method` variable has some "structural" missingness, due to the fact that only women using contraceptives are asked about the contraceptive `method`. Hence, women having missing values in the `method` variable, but non-missing values in the `contraceptive` variable, should be kept as cases of woman using no contraceptive methods. Instead, woman having missing values both in the `method` and `contraceptive` variables, should be removed, since we do not have information on contraceptive behavior for these women. To perform this operation, we first create an additional level in the `method` variable (called `1. No contraceptive method`) to distinguish between these two cases.
+Similarly, the `method` variable has some "structural" missingness, due to the fact that only women using contraceptives are asked about the contraceptive `method`. Hence, women having missing values in the `method` variable, but non-missing values in the `contraceptive` variable, should be kept as cases of woman using no contraceptive methods. Instead, women having missing values both in the `method` and `contraceptive` variables, should be removed, since we do not have information on contraceptive behavior for these women. To perform this operation, we first create an additional level in the `method` variable (called `1. No contraceptive method`) to distinguish between these two different cases of missingness.
 
 
 ```r
@@ -189,7 +188,7 @@ levels(dataset$state)
 The qualitative variables `education`, `religion`, and `child`, are measured on several categories. To maintain simple interpretation, and consistent with other studies on contraceptive preferences in India, we aggregate some of these categories. In particular:
 
 - `education`. We create a four level factor for education (No education, Low , Intermediate, and High).
-- `religion`. We consider the most frequent religions in India (Hindu, Muslim, Christian), and we grouped the other religions in a single category Others.
+- `religion`. We consider the most frequent religions in India (Hindu, Muslim, Christian), and we grouped the other religions in a single category: Others.
 - `child`. We consider a three level factor for the number of child: none, one or more than one. The `More than 1` category is fixed as baseline.
 
 The `R` code to perform these operations is:
@@ -207,12 +206,12 @@ dataset$child <- as.factor(dataset$child)
 dataset$child <- factor(dataset$child,levels=levels(dataset$child)[c(3,1,2)])
 ```
 
-The variable `method` is the response variable, and is composed by the following levels:
+The variable `method` is the response variable, and is composed by the following categories:
 
 - `1. No contraceptive method`
 - `2. Sterilization`. Includes female sterilization, hysteroctomy and male sterilization.
 - `3. Natural methods`. Includes periodic abstinence and withdrawal
-- `4. Modern methods`. Includes condom, copper T/IUD, diaphgram / jelly, injectible contraception and oral pill
+- `4. Modern methods`. Includes condom, copper T/IUD, diaphgram/jelly, injectible contraception and oral pill
 
 See Section 1.1 of the paper for a justification on the definition of these four categories. The `R` code to create the final response variable is:
 
@@ -244,7 +243,7 @@ knitr::kable(t(as.matrix(table(dataset$method))),format='markdown')
 
 ## Final dataset
 
-The final dataset is saved as a workspace and summarized below.
+The final dataset is saved in the workspace and summarized below.
 
 
 ```r
