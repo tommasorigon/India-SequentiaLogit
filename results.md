@@ -363,5 +363,5 @@ p6 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = 
 # ggsave("img/map.jpg",grid.arrange(p4,p5,p6,ncol=3),device="jpg",width=10,height=4.5)
 ```
 
-![](https://raw.githubusercontent.com/tommasorigon/India-SequentiaLogit/master/img/map.jpg)
+![](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/map.jpg)
 
