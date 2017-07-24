@@ -13,7 +13,7 @@ These sections should be executed in order.
 
 In the repository we also made available the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) which contains the core functions, such as the Gibbs sampling algorithm described in detail in Section 3 of the paper.
 
-## Shiny application
+# Shiny application
 
 We also provide a [Shiny application](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/SequentiaLogisticApp) in which, for every combination of covariates characterizing the different women profiles, the posterior probabilities of the corresponding contraceptive preferences, and the sequential probabilities in Figure 1, are computed. The characteristics of each woman (e.g. `AGE`, `CHILD`, etc.) can be defined interactively by the user.
 
