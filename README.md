@@ -9,7 +9,7 @@ The documentation is organized in four sections described below.
 - [`results.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/results.md): contains detailed guidelines and code to reproduce the graphs and tables in Section 4, where posterior inference under the proposed model is performed.
 - [`predictive_pref.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/predictive_perf.md): contains detailed guidelines and code to study out-of-sample predictive performance, and compare results with relevant competitors.
 
-These sections should be executed in order.
+These sections should be executed in order. Note also that all the above analyses are performed with a **MacBook Pro (OS X El Capitan, version 10.11.6)**.
 
 In the repository we also made available the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) which contains the core functions, such as the Gibbs sampling algorithm described in detail in Section 3 of the paper.
 
