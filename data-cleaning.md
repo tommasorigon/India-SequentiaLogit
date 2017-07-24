@@ -210,8 +210,8 @@ The variable `method` is the response variable, and is composed by the following
 
 - `1. No contraceptive method`
 - `2. Sterilization`. Includes female sterilization, hysteroctomy and male sterilization.
-- `3. Natural methods`. Includes periodic abstinence and withdrawal
-- `4. Modern methods`. Includes condom, copper T/IUD, diaphgram/jelly, injectible contraception and oral pill
+- `3. Natural methods`. Includes periodic abstinence and withdrawal.
+- `4. Modern methods`. Includes condom, copper T/IUD, diaphgram/jelly, injectible contraception and oral pill.
 
 See Section 1.1 of the paper for a justification on the definition of these four categories. The `R` code to create the final response variable is:
 
