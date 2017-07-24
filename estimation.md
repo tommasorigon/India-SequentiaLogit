@@ -276,9 +276,9 @@ knitr::kable(tab1,format='markdown')
 
 |                     |  25%|  50%|  75%|
 |:--------------------|----:|----:|----:|
-|Usage choice         | 1887| 2363| 3074|
-|Reversibility choice | 1629| 1992| 3075|
-|Method choice        | 1244| 2822| 3401|
+|Usage choice         | 1589| 2260| 2949|
+|Reversibility choice | 1298| 1805| 3191|
+|Method choice        |  898| 2960| 3441|
 
 ```r
 # Effective sample size of SPLINES COEFFICIENTS
@@ -294,9 +294,9 @@ knitr::kable(tab2,format='markdown')
 
 |                     |  25%|  50%|  75%|
 |:--------------------|----:|----:|----:|
-|Usage choice         | 1122| 1242| 1532|
-|Reversibility choice | 1088| 1152| 1710|
-|Method choice        | 1460| 1549| 1938|
+|Usage choice         | 1126| 1171| 1385|
+|Reversibility choice |  965| 1085| 1487|
+|Method choice        | 1489| 1663| 2173|
 
 ```r
 # Effective sample size of FIXED EFFECTS
@@ -312,7 +312,7 @@ knitr::kable(tab3,format='markdown')
 
 |                     |  25%|  50%|  75%|
 |:--------------------|----:|----:|----:|
-|Usage choice         | 3327| 3435| 3639|
-|Reversibility choice | 3158| 3564| 3630|
-|Method choice        | 3007| 3532| 3728|
+|Usage choice         | 3330| 3575| 3702|
+|Reversibility choice | 3337| 3437| 3607|
+|Method choice        | 3035| 3397| 3671|
 
