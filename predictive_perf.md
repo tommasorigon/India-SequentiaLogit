@@ -1,4 +1,4 @@
-# Out-of-Sample Predictive performance
+# Out-of-Sample Predictive Performance
 
 ## Description
 
