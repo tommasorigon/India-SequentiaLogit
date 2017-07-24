@@ -4,7 +4,7 @@
 
 In this document we perform posterior computation for the model described in Section 2, via the Gibbs sampler outlined in Section 3 of the paper. We implemented the algorithms in R: the source [R code](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) is made available in the github repository. 
 
-The Gibbs sampler for our model can be called using the function `fit_logit()`, which we will use extensively during this document. As a first step, we load in the memory all the required libraries,  and the previously obtained [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md), which **is not made available** in this repository. See the `data-cleaning.md` documentation for guidelines on how to obtain the final dataset under analysis.
+The Gibbs sampler for our model can be called using the function `fit_logit()`, which we will use extensively during this document. As a first step, we load in the memory all the required libraries,  and the previously obtained [`dataset`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md), which **is not made available** in this repository. See the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) documentation for guidelines on how to obtain the final dataset under analysis.
 
 The function `fit_logit()` also allows the estimation of the three sub-models described in Section 4.1.1 of the paper. Notice that the implementation of the simpler Gaussian random effects model, can be easily performed by fixing the number of mixture components `H = 1` in the code for our more general formulation.
 
