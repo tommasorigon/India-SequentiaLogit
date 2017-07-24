@@ -85,7 +85,7 @@ knitr::kable(tab,format='markdown')
 |Precision of the cluster means |    0.2333634|            0.0215313|     0.0111064|
 |Precision within the cluster   |    5.0992340|            1.1460989|     1.6656611|
 
-The prior hyperparameters for our model and the sub-models, discussed in Section 4, are specified through a list. Note that fixing `P_Fix_const = 1e-2` is equivalent to setting **B** = (100,...,100). We derived different prior distribution for some parameters in the `usage choice` model, the `reversibility choice`, and the `method choice` model, basing this decision on the table reported above.
+The prior hyperparameters for our model and the sub-models, discussed in Section 4, are specified through a list. Note that fixing `P_Fix_const = 1e-2` is equivalent to setting **B** = (100,...,100). We derived different prior distributions for some parameters in the `usage choice` model, the `reversibility choice` model, and the `method choice` model, basing this decision on the table reported above.
 
 
 ```r
@@ -109,7 +109,7 @@ prior3 <- list(P_Fix_const=1e-2,
 ```
 
 
-The estimation process **requires a non-negligible amount of time** to be completed. On a standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chain in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in the memory directly, without running the next steps. If the reader is not interested in obtaining by itself these workspaces, he / she  can skip to the convergence diagnostic step.
+The entire estimation process **requires a non-negligible amount of time** to be completed. On a standard laptop, this will need about 4-5 hours. We made available the results of the MCMC chains in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, which can be loaded in the memory directly, without running the next posterior computation steps.
 
 #### 1. Usage choice
 
@@ -133,7 +133,7 @@ fit1_dp_ranef_s    <- fit_logit(f_s,dataset$state,dataset$age,dataset,method="dp
 
 #### 2. Reversibility choice
 
-For the `reversibility choice` model we restrict the analysis to the smaller dataset (called `dataset2`) comprising only women who are making use of contraception. See discussion in Section 3 of the paper. In this case the target is `1` if the woman is using a temporary method, and `0` if the woman is using sterilization.
+For the `reversibility choice` model we restrict the analysis to the smaller dataset (called `dataset2`) comprising only women who are currently using contraceptives. See discussion in Section 3 of the paper. In this case the target is `1` if the woman is using a temporary method, and `0` if the woman is using sterilization.
 
 
 ```r
@@ -157,7 +157,7 @@ fit2_dp_ranef_s    <- fit_logit(f_s,dataset2$state,dataset2$age,dataset2,method=
 
 #### 3. Method choice
 
-Finally for the `method choice` model we perform similar steps as before. In particular, we further restrict the focus on those women using reversible contraceptive (comprising `dataset3`). In this case the target is `1` if the woman is using a modern temporary method, and `0` if the woman is a natural temporary method.
+Finally for the `method choice` model we perform similar steps as before. In particular, we further restrict the focus on those women using reversible contraceptives (comprising `dataset3`). In this case the target is `1` if the woman is using a modern temporary method, and `0` if the woman is using a natural temporary method.
 
 
 
@@ -179,7 +179,7 @@ fit3_dp_ranef      <- fit_logit(f,dataset3$state,dataset3$age,dataset3,method="d
 fit3_dp_ranef_s    <- fit_logit(f_s,dataset3$state,dataset3$age,dataset3,method="dp_ranef_s",prior3,R,burn_in)
 ```
 
-We end the estimation step by thinning the beta coefficients, cleaning the workspace and finally saving the results in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder.
+We end the estimation step by cleaning the workspace, and finally saving the results in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder.
 
 
 ```r
@@ -211,7 +211,7 @@ save(fit1_dp_ranef_s,
 
 ## Convergence diagnostic for the Bayesian semiparametric model
 
-We load again everything in memory, on a clean envirnoment. As previously mentioned, the results are available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, if the computations are excessive. We uploaded the workspaces separately due to limitation of GitHub in file size.
+We load again everything in the memory, on a clean envirnoment. As previously mentioned, the results are available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, if the computations are excessive. We uploaded the workspaces separately due to limitation of GitHub in file size.
 
 
 ```r
