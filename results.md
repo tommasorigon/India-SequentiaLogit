@@ -1,8 +1,8 @@
-# Results: DIC/WAIC indexes, graphs and tables
+# Results: DIC/WAIC indexes, figures and tables
 
 ## Results
 
-This documentation reproduces the main results provided in Section 4 of the paper, including the computation of the DIC and WAIC indexes, the graphs and the tables.
+This documentation reproduces the main results provided in Section 4 of the paper, including the computation of the DIC and WAIC indexes, the figures and the tables.
 
 The results of posterior computation are available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/workspaces) folder, and have been previously obtained in the [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md) document. We load all these files in the memory, along with the cleaned dataset obtained in the [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md) document, and the [`R core functions`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R). Again note that the `dataset` **is not made available** in this GitHub repository.
 
@@ -72,7 +72,7 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 ## Effects of the variables area, education, religion and child
 
-In the following, we compute the posterior mean of the effects of the variables `area`, `education`, `religion` and `child`, together with the 0.95% credible intervals. 
+In the following, we compute the posterior mean of the effects of the variables `area`, `education`, `religion` and `child`, together with the 0.95% credible intervals. These quantities are shown in Table 3 of the paper.
 
 
 ```r
@@ -253,7 +253,7 @@ The graphical representation of India requires additional external files, which 
 
 In order to make the map data compatible with ours, there are some extra steps to do. Having loaded the data in memory, we compare which States are present in the map but not included in the survey. In many cases, it is just a matter of relabeling (e.g. from `Dadra and Nagar Haveli` to `Dadra+Nagar Haveli`). However, some cases require special attention:
 
-1. As mentioned, `Dadra and Nagar Haveli`, `Daman and Diu`, `Jammu and Kashmir`,`Odisha` and `Puducherry` can be relabelled to be coherent with the names of the our survey.
+1. As mentioned, `Dadra and Nagar Haveli`, `Daman and Diu`, `Jammu and Kashmir`,`Odisha` and `Puducherry` can be relabelled to be coherent with the names of the survey.
 2. For `Andaman and Nicobar` and `Lakshadweep`, both small islands, we do not have any observation in our dataset, and they will be ignored.
 3. `Telengana` is grouped with `Andhra Pradesh`. In fact, `Telengana` became a separate State recently, but at the time of the interview it was part of `Andhra Pradesh`.
 
