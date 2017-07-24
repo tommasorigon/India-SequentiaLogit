@@ -1,4 +1,4 @@
-## Bayesian semiparametric modelling of contraceptive behaviour in India via sequential logistic regressions
+# Bayesian semiparametric modelling of contraceptive behaviour in India via sequential logistic regressions
 
 This repository is associated with the paper [Rigon, Durante and Torelli (2016). *Bayesian semiparametric modelling of contraceptive behavior in India via sequential logistic regressions*](https://arxiv.org/abs/1405.7555), and aims at providing detailed materials to fully reproduce the analyses in the paper. A Shiny application is also made available to interactively visualize relevant quantities of direct interest for current family planning policies in India.
 
@@ -13,7 +13,7 @@ These sections should be executed in order.
 
 In the repository we also made available the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) which contains the core functions, such as the Gibbs sampling algorithm described in detail in Section 3 of the paper.
 
-# Shiny application
+### Shiny application
 
 We also provide a [Shiny application](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/SequentiaLogisticApp) in which, for every combination of covariates characterizing the different women profiles, the posterior probabilities of the corresponding contraceptive preferences, and the sequential probabilities in Figure 1, are computed. The characteristics of each woman (e.g. `AGE`, `CHILD`, etc.) can be defined interactively by the user.
 
