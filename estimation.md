@@ -38,7 +38,7 @@ f   <- as.formula(target ~ age + child + area + religion + education)
 f_s <- as.formula(target ~ child + area + religion + education)
 ```
 
-As discussed in Section 4 of the paper, we fix the hyperparameters for the Gaussian kernels in the mixture of Gaussians prior for the state-specific effects, via a data driven approach. In the following code, provides details associated with this data driven prior calibration procedure. 
+As discussed in Section 4 of the paper, we fix the hyperparameters for the Gaussian kernels in the mixture of Gaussians prior for the state-specific effects, via a data driven approach. The following code provides the details associated with this data driven prior calibration procedure. 
 
 In particular, we estimate a classical generalized linear model for the `usage choice`, the `reversibility choice`, and the `method choice`, respectively. Then, we clustered together the `state`-specific parameters, treated here as fixed effect, via hieriarchical clustering with complete linkage. The number of clusters is selected via graphical inspection of the dendrograms. Then, we compute the average variance within cluster and the average of the squared cluster means, for all the models. These quantities will be helpful in specifying hyperparameters. See Section 4 of the paper for a detailed discussion.
 
