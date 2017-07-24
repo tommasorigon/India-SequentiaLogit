@@ -5,9 +5,9 @@ This repository is associated with the paper [Rigon, Durante and Torelli (2016).
 The documentation is organized in four sections described below.  
 
 - [`data-cleaning.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/data-cleaning.md): contains detailed guidelines and code to download the raw data, and perform preliminary operations to clean the dataset.
-- A [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md): contains detailed guidelines and code to perform posterior computation for the model presented in Section 2 of the paper, and the associated sub-models described in Section 4. Some convergence diagnostics for the MCMC chains are also discussed.
-- A [`results.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/results.md): contains detailed guidelines and code to reproduce the graphs and tables in Section 4, where posterior inference under the proposed model is performed.
-- A [`predictive_pref.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/predictive_perf.md): contains detailed guidelines and code to study out-of-sample predictive performance, and compare results with relevant competitors.
+- [`estimation.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/estimation.md): contains detailed guidelines and code to perform posterior computation for the model presented in Section 2 of the paper, and the associated sub-models described in Section 4. Some convergence diagnostics for the MCMC chains are also discussed.
+- [`results.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/results.md): contains detailed guidelines and code to reproduce the graphs and tables in Section 4, where posterior inference under the proposed model is performed.
+- [`predictive_pref.md`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/predictive_perf.md): contains detailed guidelines and code to study out-of-sample predictive performance, and compare results with relevant competitors.
 
 These sections should be executed in order.
 
