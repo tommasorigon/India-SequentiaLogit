@@ -172,7 +172,7 @@ X_val_Fix  <- model.matrix(method ~ child + area + religion + education, data = 
 data_validation2        <- data_validation[data_validation$method != "1. No contraceptive method",]
 data_validation2$method <- factor(data_validation2$method)
 
-# DP + splines 
+# Mixture + splines 
 B_val2      <- spline.des(knots, data_validation2$age, degree + 1, 0 * data_validation2$age, outer.ok=TRUE)$design
 X_val2_RF   <- dummy(data_validation2$state,drop = FALSE)[,-1]
 X_val2_Fix  <- model.matrix(method ~ child + area + religion + education, data = data_validation2)[,-1]
