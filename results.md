@@ -220,7 +220,7 @@ distance1 <- comp.psm(fit1_dp_ranef_s$S)
 distance2 <- comp.psm(fit2_dp_ranef_s$S)
 distance3 <- comp.psm(fit3_dp_ranef_s$S)
 
-# Clustering states as in Medvedovic et al. (2004)
+# Clustering states as in Medvedovic et al. (2002)
 clust1_med  <- medv(distance1)
 clust2_med  <- medv(distance2)
 clust3_med  <- medv(distance3)
