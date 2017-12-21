@@ -1,7 +1,5 @@
 # Preliminary operations for the IHDS-II dataset
 
-
-
 ## The Indian Human Development Survey-II (IHDS-II)
 
 This short document explains in detail all the preliminary operations performed to the [IDHS-II](http://ihds.info/IHDS-II) dataset in our paper. From the [official documentation](http://www.icpsr.umich.edu/icpsrweb/content/DSDR/idhs-II-data-guide.html):
@@ -72,7 +70,7 @@ dataset <- dataset %>% filter(eligible=="(1) Yes 1")
 dataset <- dataset %>% filter(age <= 49)
 ```
 
-Eligible women comprise a total of 35281 observations.
+Eligible women comprise a total of `35281` observations.
 
 ## Cleaning missing or not coherent values 
 
