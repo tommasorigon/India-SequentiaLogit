@@ -52,6 +52,7 @@ tab <- matrix(0,2,3)
 dataset$target     <- factor(dataset$method!="1. No contraceptive method")
 coef1_glm          <- coef(glm(update(f,.~ state +. ),data=dataset,family="binomial"))[2:33]
 cl       <- hclust(dist(coef1_glm),method = "complete")
+# plot(cl) # Graphical inspection of the dendrogram, not shown
 cl_means <- tapply(coef1_glm,cutree(cl,3),mean) 
 tab[1,1] <- 1/mean(cl_means^2)
 tab[2,1] <- 1/mean(tapply(coef1_glm,cutree(cl,3),var))
@@ -61,6 +62,7 @@ dataset2            <- dataset[dataset$method != "1. No contraceptive method",]
 dataset2$target     <- factor(dataset2$method != "2. Sterilization") 
 coef2_glm           <- coef(glm(update(f,.~ state +. ),data=dataset2,family="binomial"))[2:33]
 cl       <- hclust(dist(coef2_glm),method = "complete")
+# plot(cl) # Graphical inspection of the dendrogram, not shown
 cl_means <- tapply(coef2_glm,cutree(cl,4),mean)
 tab[1,2] <- 1/mean(cl_means^2)
 tab[2,2] <- 1/mean(tapply(coef2_glm,cutree(cl,3),var),na.rm=TRUE)
@@ -70,6 +72,7 @@ dataset3            <- dataset2[dataset2$method != "2. Sterilization",]
 dataset3$target     <- factor(dataset3$method != "3. Natural methods") 
 coef3_glm <- coef(glm(update(f,.~ state +. ),data=dataset3,family="binomial"))[2:33]
 cl       <- hclust(dist(coef3_glm),method = "complete")
+# plot(cl) # Graphical inspection of the dendrogram, not shown
 cl_means <- tapply(coef3_glm,cutree(cl,3),mean)
 
 tab[1,3] <- 1/mean(cl_means^2)
@@ -231,7 +234,7 @@ We load again everything in the memory, on a clean envirnoment. As previously me
 ```r
 rm(list=ls())
 
-# Load the clean dataset
+# Load the clean dataset - not available in the GitHub repository
 load("dataset.RData")
 
 # Load the results of the MCMC chain
