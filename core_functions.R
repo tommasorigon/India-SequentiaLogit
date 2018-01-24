@@ -104,7 +104,7 @@ logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, ve
     if(H > 1){
       lprobs <- t(sapply(beta_RF, function(x) log(nu) + dnorm(x,mu_RF_bar,sqrt(1/tau),log=TRUE)))
       probs  <- exp(t(apply(lprobs,1, function(x) x - max(x)))) # Probabilities are rescaled for numerical stability
-      # probs  <- probs/rowSums(probs). This step is necessary: sample automatically perform this operation
+      # probs  <- probs/rowSums(probs). This step is not necessary: sample automatically perform this operation
       G      <- factor(apply(probs,1,function(x) sample(H,1,prob = x)),levels=1:H)
     }
     
@@ -277,7 +277,7 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data, inner_knots, d
     if(H > 1){
       lprobs <- t(sapply(beta_RF, function(x) log(nu) + dnorm(x,mu_RF_bar,sqrt(1/tau),log=TRUE)))
       probs  <- exp(t(apply(lprobs,1, function(x) x - max(x)))) # Probabilities are rescaled for numerical stability
-      # probs  <- probs/rowSums(probs). This step is necessary: sample automatically perform this operation
+      # probs  <- probs/rowSums(probs). This step is not necessary: sample automatically perform this operation
       G      <- factor(apply(probs,1,function(x) sample(H,1,prob = x)),levels=1:H)
     }
     
