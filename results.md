@@ -304,7 +304,7 @@ states.shp$NAME_1[18]
 states.shp$NAME_1[26] <- "Orissa"
 states.shp$NAME_1[27] <- "Pondicherry"
 
-# Telengana has to be merged with Andrea Pradesh
+# Telengana has to be merged with Andhra Pradesh
 states.shp$NAME_1[33] <- "Andhra Pradesh"; states.shp$ID_1[33] <- 2
 states.shp$NAME_1 <- as.factor(states.shp$NAME_1)
 
@@ -328,7 +328,7 @@ final.plot     <- merge.shp.coef[order(merge.shp.coef$order), ]
 
 # Final plot - Attention, It could be very slow!
 final.plot$k <- "Usage Choice"
-p4 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "darkred",high = "white", breaks=-6:6)
+p4 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "black",high = "white", breaks=-6:6)
 
 # Reversibility choice
 state_effects <- c(0,apply(fit2_dp_ranef_s$beta_RF,2,median)) 
@@ -342,7 +342,7 @@ final.plot     <- merge.shp.coef[order(merge.shp.coef$order), ]
 
 # Final plot
 final.plot$k <- "Reversibility Choice"
-p5 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "darkred",high = "white", breaks=-6:6)
+p5 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "black",high = "white", breaks=-6:6)
 
 # Method choice 
 state_effects <- c(0,apply(fit3_dp_ranef_s$beta_RF,2,median))
@@ -356,11 +356,11 @@ final.plot     <- merge.shp.coef[order(merge.shp.coef$order), ]
 
 # Final plot
 final.plot$k <- "Method Choice"
-p6 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "darkred",high = "white", breaks=-6:6)
+p6 <- ggplot() + geom_polygon(data = final.plot, aes(x = long, y = lat, group = group, fill=Effect),col = "black") + coord_map()   +xlab("Longitude") + ylab("Latitude") + facet_grid(~k) + theme_bw() + theme(legend.position="none") + scale_fill_gradient(low = "black",high = "white", breaks=-6:6)
 
 # Commented since it could be very slow!
-# ggsave("img/map.pdf",grid.arrange(p4,p5,p6,ncol=3),device="pdf",width=10,height=4.5)
-# ggsave("img/map.jpg",grid.arrange(p4,p5,p6,ncol=3),device="jpg",width=10,height=4.5)
+ggsave("img/map.pdf",grid.arrange(p4,p5,p6,ncol=3),device="pdf",width=10,height=4.5)
+ggsave("img/map.jpg",grid.arrange(p4,p5,p6,ncol=3),device="jpg",width=10,height=4.5)
 ```
 
 ![](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/img/map.jpg)
