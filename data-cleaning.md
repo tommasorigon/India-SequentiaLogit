@@ -185,7 +185,7 @@ levels(dataset$state)
 
 The qualitative variables `education`, `religion`, and `child`, are measured on several categories. To maintain simple interpretation, and consistent with other studies on contraceptive preferences in India, we aggregate some of these categories. In particular:
 
-- `education`. We create a four level factor for education (No education, Low , Intermediate, and High).
+- `education`. We create a four level factor for education (No education, Low, Intermediate, and High).
 - `religion`. We consider the most frequent religions in India (Hindu, Muslim, Christian), and we grouped the other religions in a single category: Others.
 - `child`. We consider a three level factor for the number of children: none, one, or more than one. The `More than 1` category is fixed as baseline.
 
@@ -207,7 +207,7 @@ dataset$child <- factor(dataset$child,levels=levels(dataset$child)[c(3,1,2)])
 The variable `method` is the response variable, and is composed by the following categories:
 
 - `1. No contraceptive method`
-- `2. Sterilization`. Includes female sterilization, hysteroctomy and male sterilization.
+- `2. Sterilization`. Includes female sterilization, hysterectomy and male sterilization.
 - `3. Natural methods`. Includes periodic abstinence and withdrawal.
 - `4. Modern methods`. Includes condom, copper T/IUD, diaphgram/jelly, injectible contraception and oral pill.
 
