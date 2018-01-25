@@ -228,7 +228,7 @@ save(fit1_dp_ranef_s,
 
 ## Convergence diagnostic for the Bayesian semiparametric model
 
-We load again everything in the memory, on a clean envirnoment. As previously mentioned, the results are available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, if the computations are excessive. We uploaded the workspaces separately due to limitation of GitHub in file size.
+We load again everything in the memory, on a clean environment. As previously mentioned, the results are available in the [`workspaces`](https://github.com/tommasorigon/India-SequentiaLogit/tree/master/workspaces) folder, if the computations are excessive. We uploaded the workspaces separately due to limitation of GitHub in file size.
 
 
 ```r
