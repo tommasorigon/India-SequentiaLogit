@@ -11,7 +11,7 @@ The documentation is organized in four sections described below.
 
 These sections should be executed in order. Note also that all the above analyses are performed with a **MacBook Pro (OS X El Capitan, version 10.11.6)**, using a `R` version **3.3.2**.
 
-In the repository we also made available the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) which contains the core functions, such as the Gibbs sampling algorithm described in detail in Section 3 of the paper.
+In the repository we also made available the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) which contains the core functions, such as the Gibbs sampling algorithm described in detail in Section 3 of the paper. The file [`glossary.pdf`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/glossary.pdf) contains a conversion table for the variables defined in the file [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R), using the same notation of the paper.
 
 ### Shiny application
 
