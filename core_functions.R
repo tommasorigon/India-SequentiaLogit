@@ -360,7 +360,7 @@ fit_logit <- function(formula, strata, x_spline, data, method, prior,  R = 20000
 # Function for computing the Information Criteria DIC and WAIC
 IC <- function(model){
   p      <- model$parameters
-  # As in Gleman et. al (2014), equation (8)
+  # As in Gelman et. al (2014), equation (8)
   p_DIC  <- 2*(model$loglik_hat - mean(model$loglik))
   DIC    <- -2*model$loglik_hat + 2*p_DIC
   
