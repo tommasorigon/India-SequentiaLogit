@@ -72,7 +72,7 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 ## Effects of the variables area, education, religion and child
 
-In the following, we compute the posterior mean of the effects of the variables `area`, `education`, `religion` and `child`, together with the 0.95% credible intervals. These quantities are shown in Table 3 of the paper.
+In the following, we compute the posterior mean of the effects of the variables `area`, `education`, `religion` and `child`, together with the 0.95 credible intervals. These quantities are shown in Table 3 of the paper.
 
 
 ```r
