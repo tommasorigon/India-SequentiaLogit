@@ -1,3 +1,11 @@
+# -----------------------------------------------------------------------
+# In this file we made available an implemention of the Gibbs sampler
+# described in Section 3 of the paper Rigon, Durante and Torelli (2017). 
+# Bayesian semiparametric modelling of contraceptive behavior in India via sequential logistic regressions.
+# ----------------------------------------------------------------------
+
+# Refer also to the conversion document which available at the link: https://github.com/tommasorigon/India-SequentiaLogit/blob/master/glossary.pdf
+
 # A function for sampling from a Dirichlet distribution
 rdir <- function(n,alpha) {
   stopifnot(all(alpha> 0), n > 0)
@@ -7,62 +15,64 @@ rdir <- function(n,alpha) {
   sim / as.vector(sum)
 }
 
-# Models without the spline component
+# Models without the spline component (only for model checking and comparisons)
 logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, verbose) {
   
+  # Print the current iteration at every "verbose_step". Ignore if verbose=FALSE
   verbose_step = ceiling(R/50)
   
   # Fixed quantities
   frame  <- model.frame(formula, data = data)
-  X_Fix  <- model.matrix(frame, data = data)[,-1]
-  y      <- as.numeric(model.response(frame))-1
-  strata <- as.factor(strata)
+  X_Fix  <- model.matrix(frame, data = data)[,-1] # Design matrix of the fixed effects
+  y      <- as.numeric(model.response(frame))-1   # Response binary variabile
+  strata <- as.factor(strata)                     # Categorical variable denoting the intercept
   
-  n     <- length(y)
-  p_Fix <- NCOL(X_Fix)
+  n     <- length(y)    # Number of observations
+  p_Fix <- NCOL(X_Fix)  # Number of parameters of the fixed coefficients
+  p_RF  <- length(levels(strata)) # Number of parameters for the random effects. 
   
-  # Here we use all the levels, since no identifiability issues arises
-  p_RF  <- length(levels(strata))
+  # Hyperparameters settings
+  P_Fix   <- diag(prior$P_Fix_const,p_Fix) # Inverse of B, the prior covariance matrix of the fixed coefficients.
+  a_tau   <- prior$a_tau                   # Prior hyperparameters for the within cluster precision. See Equation (7) of the paper.
+  b_tau   <- prior$b_tau                   # As above
+  tau_mu  <- prior$tau_mu                  # Precision of the cluster mean. See equation (7) of the paper.
+  H       <- prior$H                       # Number of mixture components. See equation (7) of the paper.
   
-  # Hyperpriors
-  P_Fix   <- diag(prior$P_Fix_const,p_Fix)
-  a_tau   <- prior$a_tau
-  b_tau   <- prior$b_tau
-  tau_mu  <- prior$tau_mu
-  H       <- prior$H
+  # Initialization of the output
+  beta_Fix_out <- matrix(0, R, p_Fix) # Fixed coefficients (Eq. 10)
+  beta_RF_out  <- matrix(0, R, p_RF)  # Random intercepts (Eq. 6)
+  theta_out    <- matrix(0,R,H)       # Cluster specific means (Eq. 7)
+  tau_out      <- numeric(R)          # Precision of each Gaussian mixture component (Eq. 7)
+  S_out        <- matrix(0,R,p_RF)    # Cluster indicator
   
-  # Output
-  beta_Fix_out <- matrix(0, R, p_Fix)
-  beta_RF_out  <- matrix(0, R, p_RF)
-  theta_out    <- matrix(0,R,H)
-  tau_out      <- numeric(R)
-  S_out        <- matrix(0,R,p_RF)
-  
-  # Output for DIC and WAIC
-  loglik_out   <- numeric(R)
-  eta_hat      <- numeric(n)
-  prob_hat     <- numeric(n)
-  exp_lppd     <- numeric(n)
-  log_pdf_hat  <- numeric(n)
+  # Quantities useful for evaluating the indexes DIC, WAIC and for prediction
+  loglik_out   <- numeric(R) # Log-likelihood of each iteration of the MCMC chain        - Necessary for DIC
+  eta_hat      <- numeric(n) # Posterior mean of the each term of the linear predictor   - Necessary for DIC
+  prob_hat     <- numeric(n) # Posterior mean of the probability                         - Necessary for prediction
+  exp_lppd     <- numeric(n) # Posterior mean of each contribution to the likelihood     - Necessary for WAIC
+  log_pdf_hat  <- numeric(n) # Posterior mean of each contribution to the log-likelihood - Necessary for WAIC 
   
   # Initialization
   beta_RF   <- numeric(p_RF)
   beta_Fix  <- numeric(p_Fix)
-  eta_RF    <- numeric(n)
-  eta_Fix   <- numeric(n)
-  eta       <- numeric(n)
-  omega     <- numeric(n) 
-  S         <- factor(rep(1,p_RF),levels=1:H) # All the intercept are allocated in the first cluster
-  theta_RF  <- numeric(H)
-  tau       <- a_tau/b_tau
+  eta_RF    <- numeric(n)                      # Linear predictor of the random effects    
+  eta_Fix   <- numeric(n)                      # Linear predictor of the fixed coefficients
+  eta       <- numeric(n)                      # Linear predictor (sum of the 2 terms above)
+  omega     <- numeric(n)                      # Omega Polya-gamma random variables 
+  S         <- factor(rep(1,p_RF),levels=1:H)  # Cluster indicator - All the values are allocated in the first cluster
+  theta_RF  <- numeric(H)                      # Cluster specific means
+  tau       <- a_tau/b_tau                     # Precision of each Gaussian mixture component
   
-  # Gibbs sampling
+  # Compared to the paper, notice that some steps are in a slightly different order. 
+  # Moreover, some steps are omitted because there is not the spline component
+  
+  # Starting the Gibbs sampling
   for (r in 1:(R*thinning + burn_in)) {
     
-    # Updating omega
+    # Step 1] Updating the Polya gamma random variable omega
     omega       <- rpg.devroye(num = n, n = 1, z = eta)
     
-    # Updating the fixed effects (beta_Fix coefficients)
+    # Step 4] Updating the beta_Fix fixed coefficients
     eig       <- eigen(crossprod(X_Fix * sqrt(omega)) + P_Fix, symmetric = TRUE)
     Sigma_Fix <- crossprod(t(eig$vectors)/sqrt(eig$values))
     mu_Fix    <- Sigma_Fix %*% (crossprod(X_Fix, y - 0.5 - omega*eta_RF))
@@ -70,35 +80,35 @@ logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, ve
     beta_Fix  <- mu_Fix + c(matrix(rnorm(1 * p_Fix), 1, p_Fix) %*% A1)
     eta_Fix   <- X_Fix %*% beta_Fix
     
-    # Updating the random effects (beta_RF coefficients)
+    # Step 6] Updating the beta_RF random effects
     reg       <- tapply(y - 0.5 - omega*eta_Fix, strata, sum) + theta_RF[S]*tau
     Sigma_RF  <- 1/(tapply(omega, strata, sum) + tau)
     mu_RF     <- Sigma_RF * reg
     beta_RF   <- rnorm(p_RF, mu_RF, sqrt(Sigma_RF))
     eta_RF    <- beta_RF[as.numeric(strata)]
     
-    # Linear predictor
+    # Update the global linear predictor
     eta <- as.numeric(eta_RF + eta_Fix)
     
-    # Updating the mixture variance
+    # Step 7] Updating the mixture precision
     tau <- rgamma(1, a_tau + p_RF/2, b_tau + sum((beta_RF - theta_RF[S])^2)/2)
     
-    # Updating the mixture mean
-    n_S             <- as.numeric(table(S)) # Observations for each cluster
+    # Step 8] Updating the mixture mean
+    n_S             <- as.numeric(table(S)) # Number of observations within each cluster
     reg             <- tapply(beta_RF*tau, S, sum)
-    reg[is.na(reg)] <- 0 # If in some cluster there are no observation set the mean to 0.
+    reg[is.na(reg)] <- 0 # If in some cluster there are no observation, set the mean to 0 (the hyperprior)
     Sigma_theta_RF  <- 1/(tau_mu + tau*n_S) 
     mu_theta_RF     <- Sigma_theta_RF * reg
     theta_RF        <- rnorm(H, mu_theta_RF, sqrt(Sigma_theta_RF))
     
-    # Updating the mixture weights
+    # Step 9] Updating the mixture weights
     nu  <- c(rdir(1, 1/H + n_S)) # If H=1 it returns nu = 1.
     
     # Updating the cluster indicator
     if(H > 1){
       lprobs <- t(sapply(beta_RF, function(x) log(nu) + dnorm(x,theta_RF,sqrt(1/tau),log=TRUE)))
-      probs  <- exp(t(apply(lprobs,1, function(x) x - max(x)))) # Numerical stability!
-      # probs  <- probs/rowSums(probs). Not necessary if the sample command is used.
+      probs  <- exp(t(apply(lprobs,1, function(x) x - max(x)))) # Probabilities are rescaled for numerical stability
+      # probs  <- probs/rowSums(probs). This step is not necessary: the R command sample used above performs this operation internally
       S      <- factor(apply(probs,1,function(x) sample(H,1,prob = x)),levels=1:H)
     }
     
@@ -127,6 +137,7 @@ logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, ve
     }
   }
   
+  # Likelihood evaluated in the Bayes estimator - Useful for computing the DIC
   loglik_hat <- sum(y*eta_hat - log(1 + exp(eta_hat)))
   
   list(beta_Fix = beta_Fix_out, 
@@ -145,80 +156,83 @@ logit_ranefDP <- function(formula, strata, data, prior, R, burn_in, thinning, ve
 }
 
 # Models with the spline component
-logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, degree, dif,prior, R , burn_in, thinning, verbose) {
+logit_ranefDP_spline <- function(formula, strata, x_spline, data, inner_knots, degree, dif, prior, R , burn_in, thinning, verbose) {
   
+  # Print the current iteration every "verbose_step". Ignore if verbose=FALSE
   verbose_step = ceiling(R/50)
   
   # Fixed quantities
   frame  <- model.frame(formula, data = data)
-  X_Fix <- model.matrix(frame, data = data)[,-1]
-  y      <- as.numeric(model.response(frame))-1
-  strata <- as.factor(strata); 
+  X_Fix  <- model.matrix(frame, data = data)[,-1] # Design matrix fixed effects
+  y      <- as.numeric(model.response(frame))-1  # Response binary variabile
+  strata <- as.factor(strata)                    # Categorical variable denoting the intercept
   
-  n     <- length(y)
-  p_Fix <- NCOL(X_Fix)
-  
-  # Remove one element, since the first is used as baseline. 
-  p_RF  <- length(levels(strata)) - 1; 
+  # Hyperparameters settings
+  n     <- length(y)    # Number of observations
+  p_Fix <- NCOL(X_Fix)  # Number of parameters of the fixed coefficients
+  p_RF  <- length(levels(strata)) - 1 # Number of parameters of the random effects. 
   
   # Hyperpriors
-  P_Fix   <- diag(prior$P_Fix_const,p_Fix)
-  a_tau   <- prior$a_tau
-  b_tau   <- prior$b_tau
-  tau_mu  <- prior$tau_mu
-  H       <- prior$H
-  a_lambda      <- prior$a_lambda
-  b_lambda      <- prior$b_lambda
+  P_Fix   <- diag(prior$P_Fix_const,p_Fix) # Inverse of B, the prior covariance matrix of the fixed coefficients.
+  a_tau   <- prior$a_tau                   # Prior hyperparameters for the within cluster precision. See Equation (7) of the paper.
+  b_tau   <- prior$b_tau                   # As above
+  tau_mu  <- prior$tau_mu                  # Precision of the cluster mean. See equation (7) of the paper.
+  H       <- prior$H                       # Number of mixture components. See equation (7) of the paper.
+  a_lambda      <- prior$a_lambda          # Prior hyperparameters for the smoothing parameter. See equation (9) of the paper.
+  b_lambda      <- prior$b_lambda          # As above
   
-  # Knots placement
+  # Placements of the knots for the spline basis
   xl    <- min(x_spline); xr <- max(x_spline); dx <- (xr - xl) / (inner_knots-1)
   knots <- seq(xl - degree * dx, xr + degree * dx, by = dx)
   
-  # Fixed quantities
-  B        <- spline.des(knots, x_spline, degree + 1, 0 * x_spline, outer.ok=TRUE)$design
-  rankD    <- NCOL(B) - dif
-  p_spline <- NCOL(B)
+  # Fixed quantities related to P-splines
+  B        <- spline.des(knots, x_spline, degree + 1, 0 * x_spline, outer.ok=TRUE)$design # B-spline design matrix 
+  rankD    <- NCOL(B) - dif # Rank of the smoothing matrix D
+  p_spline <- NCOL(B)       # Number of parameters for the spline
   
+  # Creation of the penalty matrix D as for Equation (9) of the paper
   if(dif==0) {D <- diag(p_spline)} else{D <- diff(diag(p_spline),dif=dif)}
-  DtD <- crossprod(D) 
+  DtD <- crossprod(D) # Penalty matrix
   
-  # Output
-  beta_Fix_out <- matrix(0, R, p_Fix)
-  beta_RF_out  <- matrix(0, R, p_RF)
-  theta_out    <- matrix(0,R,H)
-  tau_out      <- numeric(R)
-  S_out        <- matrix(0,R,p_RF)
-  beta_spline_out <- matrix(0, R, p_spline)
-  lambda_out      <- numeric(R)
+  # Initialization of the output
+  beta_Fix_out <- matrix(0, R, p_Fix)        # Fixed coefficients (Eq. 10)
+  beta_RF_out  <- matrix(0, R, p_RF)         # Random intercepts (Eq. 6)
+  theta_out    <- matrix(0,R,H)              # Cluster specific means (Eq. 7)
+  tau_out      <- numeric(R)                 # Precision of each Gaussian mixture component (Eq. 7)
+  S_out        <- matrix(0,R,p_RF)           # Cluster indicator 
+  beta_spline_out <- matrix(0, R, p_spline)  # Spline coefficients (Eq. 9)
+  lambda_out      <- numeric(R)              # Smoothing parameter 
   
-  # Output for DIC and WAIC
-  loglik_out   <- numeric(R)
-  eta_hat      <- numeric(n)
-  prob_hat     <- numeric(n)
-  exp_lppd     <- numeric(n)
-  log_pdf_hat  <- numeric(n)
+  # Quantities useful for evaluating the indexes DIC, WAIC and for prediction
+  loglik_out   <- numeric(R) # Log-likelihood of each iteration of the MCMC chain        - Necessary for DIC
+  eta_hat      <- numeric(n) # Posterior mean of the each term of the linear predictor   - Necessary for DIC
+  prob_hat     <- numeric(n) # Posterior mean of the probability                         - Necessary for prediction
+  exp_lppd     <- numeric(n) # Posterior mean of each contribution to the likelihood     - Necessary for WAIC
+  log_pdf_hat  <- numeric(n) # Posterior mean of each contribution to the log-likelihood - Necessary for WAIC
   
   # Initialization
   beta_RF   <- numeric(p_RF)
   beta_Fix  <- numeric(p_Fix)
   beta_spline   <- numeric(p_spline)
-  eta_spline    <- numeric(n)
-  eta_RF    <- numeric(n)
-  eta_Fix   <- numeric(n)
-  eta       <- numeric(n)
-  omega     <- numeric(n) 
-  S         <- factor(rep(1,p_RF),levels=1:H) # All the intercept are allocated in the first cluster
-  theta_RF  <- numeric(H)
-  lambda    <- a_lambda/b_lambda
-  tau       <- a_tau/b_tau
+  eta_spline    <- numeric(n) # Linear predictor of the splines 
+  eta_RF    <- numeric(n)     # Linear predictor of the random effects
+  eta_Fix   <- numeric(n)     # Linear predictor of the fixed coefficients
+  eta       <- numeric(n)     # Linear predictor (sum of the 3 terms above)
+  omega     <- numeric(n)     # Omega Polya-gamma random variables
+  S         <- factor(rep(1,p_RF),levels=1:H) # Cluster indicator - All the values are allocated in the first cluster
+  theta_RF  <- numeric(H)         # Cluster specific means
+  lambda    <- a_lambda/b_lambda  # Smoothing parameters
+  tau       <- a_tau/b_tau        # Precision of each Gaussian mixture component
   
-  # Gibbs sampling
+  # Compared to the paper, notice that some steps are executed in a slightly different order.
+  
+  # Starting the Gibbs sampling
   for (r in 1:(R*thinning + burn_in)) {
     
-    # Updating omega
+    # Step 1] Updating the Polya gamma random variable omega
     omega       <- rpg.devroye(num = n, n = 1, z = eta)
     
-    # Updating gamma (the beta_splines coefficient)
+    # Step 2] Updating the beta_splines splines coefficient
     eig          <- eigen(crossprod(B * sqrt(omega)) + lambda*DtD, symmetric = TRUE)
     Sigma_spline <- crossprod(t(eig$vectors)/sqrt(eig$values))
     mu_spline    <- Sigma_spline %*% (crossprod(B, y - 0.5- omega*(eta_RF + eta_Fix)))
@@ -226,13 +240,13 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
     beta_spline  <- mu_spline + c(matrix(rnorm(1 * p_spline), 1, p_spline) %*% A1)
     eta_spline   <- as.numeric(B%*%beta_spline) 
     
-    # Updating the smoothing parameter lambda
+    # Step 3] Updating the smoothing parameter lambda
     mahalanob       <- as.numeric(crossprod(D%*%beta_spline)) 
     a_lambda_tilde  <- a_lambda + rankD/2
     b_lambda_tilde  <- b_lambda + mahalanob/2
     lambda          <- rgamma(1, a_lambda_tilde, b_lambda_tilde)
     
-    # Updating the fixed effects (beta_Fix coefficients)
+    # Step 4] Updating the beta_Fix fixed coefficients
     eig       <- eigen(crossprod(X_Fix * sqrt(omega)) + P_Fix, symmetric = TRUE)
     Sigma_Fix <- crossprod(t(eig$vectors)/sqrt(eig$values))
     mu_Fix    <- Sigma_Fix %*% (crossprod(X_Fix, y - 0.5 - omega*(eta_RF + eta_spline)))
@@ -240,35 +254,35 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
     beta_Fix  <- mu_Fix + c(matrix(rnorm(1 * p_Fix), 1, p_Fix) %*% A1)
     eta_Fix   <- X_Fix %*% beta_Fix
     
-    # Updating the random effects (beta_RF coefficients)
+    # Step 6] Updating the beta_RF random effects 
     reg       <- tapply(y - 0.5 - omega*(eta_Fix + eta_spline), strata, sum)[-1] + theta_RF[S]*tau
     Sigma_RF  <- 1/(tapply(omega, strata, sum) + tau)[-1]
     mu_RF     <- Sigma_RF * reg
     beta_RF   <- rnorm(p_RF, mu_RF, sqrt(Sigma_RF))
     eta_RF    <- c(0,beta_RF)[as.numeric(strata)]
     
-    # Linear predictor
+    # Update the global linear predictor
     eta <- as.numeric(eta_RF + eta_Fix + eta_spline)
     
-    # Updating the mixture variance
+    # Step 7] Updating the mixture precision
     tau <- rgamma(1, a_tau + p_RF/2, b_tau + sum((beta_RF - theta_RF[S])^2)/2)
     
-    # Updating the mixture mean
-    n_S             <- as.numeric(table(S)) # Observations for each cluster
+    # Step 8] Updating the mixture mean
+    n_S             <- as.numeric(table(S)) # Number of observations for each cluster
     reg             <- tapply(beta_RF*tau, S, sum)
-    reg[is.na(reg)] <- 0 # If in some cluster there are no observation set the mean to 0.
+    reg[is.na(reg)] <- 0 # If in some cluster there are no observation, set the mean to 0 (the hyperprior)
     Sigma_theta_RF  <- 1/(tau_mu + tau*n_S) 
     mu_theta_RF     <- Sigma_theta_RF * reg
     theta_RF        <- rnorm(H, mu_theta_RF, sqrt(Sigma_theta_RF))
     
-    # Updating the mixture weights
+    # Step 9] Updating the mixture weights
     nu  <- c(rdir(1, 1/H + n_S)) # If H=1 it returns nu = 1.
     
-    # Updating the cluster indicator
+    # Step 5] Updating the cluster indicator
     if(H > 1){
       lprobs <- t(sapply(beta_RF, function(x) log(nu) + dnorm(x,theta_RF,sqrt(1/tau),log=TRUE)))
-      probs  <- exp(t(apply(lprobs,1, function(x) x - max(x)))) # Numerical stability!
-      # probs  <- probs/rowSums(probs). Not necessary if the sample command is used.
+      probs  <- exp(t(apply(lprobs,1, function(x) x - max(x)))) # Probabilities are rescaled for numerical stability
+      # probs  <- probs/rowSums(probs). This step is not necessary: the R command "sample" performs this operation internally
       S      <- factor(apply(probs,1,function(x) sample(H,1,prob = x)),levels=1:H)
     }
     
@@ -299,6 +313,7 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
     }
   }
   
+  # Likelihood evaluated in the Bayes estimator - Useful for computing the DIC
   loglik_hat <- sum(y*eta_hat - log(1 + exp(eta_hat)))
   
   list(beta_Fix = beta_Fix_out, 
@@ -318,7 +333,7 @@ logit_ranefDP_spline <- function(formula, strata, x_spline, data,inner_knots, de
   )
 }
 
-# Global wrapper
+# Global function that allows to call the two functions above with a unique interface
 fit_logit <- function(formula, strata, x_spline, data, method, prior,  R = 20000, burn_in = 2000, thinning=5, inner_knots = min(round(length(strata)/4),40), degree=3, dif = 2, verbose = TRUE){
   
   if(any(table(strata)==0)){stop("In the provided strata vector some levels have no observations")}
@@ -345,6 +360,7 @@ fit_logit <- function(formula, strata, x_spline, data, method, prior,  R = 20000
 # Function for computing the Information Criteria DIC and WAIC
 IC <- function(model){
   p      <- model$parameters
+  # As in Gleman et. al (2014), equation (8)
   p_DIC  <- 2*(model$loglik_hat - mean(model$loglik))
   DIC    <- -2*model$loglik_hat + 2*p_DIC
   
