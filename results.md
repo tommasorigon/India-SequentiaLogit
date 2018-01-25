@@ -112,7 +112,7 @@ knitr::kable(round(tab,digits=2),format="markdown")
 
 ## Age effects
 
-The `age` effect is obtained by computing the posterior mean of each function f_k(), along with the 0.95% point-wise credible intervals. The first step consists in constructing the B-spline basis function evaluated on the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package. In the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file, the construction of the `B` matrix proceeds exactly in the same way. 
+The `age` effect is obtained by computing the posterior mean of each function f_k(), along with the 0.95 point-wise credible intervals. The first step consists in constructing the B-spline basis function evaluated on the grid of values 15,...,49. This is done by using the `spline.des` function from the `splines` R package. In the [`core_functions.R`](https://github.com/tommasorigon/India-SequentiaLogit/blob/master/core_functions.R) file, the construction of the `B` matrix proceeds exactly in the same way. 
 
 
 ```r
