@@ -276,7 +276,7 @@ knitr::kable(round(t(tab_part1),digits = 3),format="markdown")
 
 ## Predictive performance: second step
 
-For the second step, we evaluated the remaining models jointly, so that we can make a fair comparison with the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). Women not using a contraceptive methods were excluded also from the validation set. See discussion in Section 4.1.2.
+For the second step, we evaluated the remaining models jointly, so that we can make a fair comparison with the model of [De Oliveira et al. (2014)](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0086654). Women not using a contraceptive method were excluded also from the validation set. See discussion in Section 4.1.2.
 
 
 ```r
