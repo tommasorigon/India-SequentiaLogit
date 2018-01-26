@@ -312,7 +312,7 @@ states.shp$NAME_1 <- as.factor(states.shp$NAME_1)
 states.shp.f <- fortify(states.shp, region = "ID_1")
 ```
 
-The maps in Figure 4 are obtained as follow, leveraging the posterior median of each state-specific effect in the three different models. The baseline State `Uttar Pradesh` was fixed equal to 0.
+The maps in Figure 5 are obtained as follow, leveraging the posterior median of each state-specific effect in the three different models. The baseline State `Uttar Pradesh` was fixed equal to 0.
 
 
 ```r
